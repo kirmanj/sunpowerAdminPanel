@@ -261,7 +261,7 @@ class _AddCategoryState extends State<AddCategory> {
                                               .validate()) {
                                             if (image.isEmpty) {
                                               print('select category or Image');
-                                              Scaffold.of(context)
+                                              ScaffoldMessenger.of(context)
                                                   .showSnackBar(_missingData);
                                             } else {
                                               categoryCollection
@@ -285,7 +285,7 @@ class _AddCategoryState extends State<AddCategory> {
                                                 img = '';
                                                 //image='';
                                               });
-                                              Scaffold.of(context)
+                                              ScaffoldMessenger.of(context)
                                                   .showSnackBar(_success);
                                             }
                                           }

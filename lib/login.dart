@@ -10,7 +10,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late String _email, _password, _name;
+  late String _email, _password, _name, _phone, _address;
   final auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
 
@@ -96,6 +96,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: TextField(
                                     keyboardType: TextInputType.emailAddress,
                                     decoration: InputDecoration(
+                                      hintText: 'Name',
+                                      labelText: 'Name',
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(6.0),
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _name = value.trim();
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextField(
+                                    keyboardType: TextInputType.emailAddress,
+                                    decoration: InputDecoration(
                                       hintText: 'Email',
                                       labelText: 'Email',
                                       border: OutlineInputBorder(
@@ -115,8 +134,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: TextField(
                                     keyboardType: TextInputType.emailAddress,
                                     decoration: InputDecoration(
-                                      hintText: 'Name',
-                                      labelText: 'Name',
+                                      hintText: '750xxxxxxx',
+                                      labelText: '750xxxxxxx',
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(6.0),
@@ -124,7 +143,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     onChanged: (value) {
                                       setState(() {
-                                        _name = value.trim();
+                                        _phone = value.trim();
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextField(
+                                    keyboardType: TextInputType.emailAddress,
+                                    decoration: InputDecoration(
+                                      hintText: 'Address',
+                                      labelText: 'Address',
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(6.0),
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _address = value.trim();
                                       });
                                     },
                                   ),
@@ -155,22 +193,32 @@ class _LoginScreenState extends State<LoginScreen> {
                                             .createUserWithEmailAndPassword(
                                                 email: _email,
                                                 password: _password)
-                                            .then((_) {
+                                            .then((_user) {
+                                          _user.user!.uid.toString();
                                           FirebaseFirestore.instance
                                               .collection('users')
-                                              .doc()
+                                              .doc(_user.user!.uid.toString())
                                               .set({
                                             "username": _name,
+                                            'phone': _phone,
+                                            'address': _address,
                                             "email": _email,
                                             'password': _password,
                                             "role": 1
+                                          });
+                                          setState(() {
+                                            _name = "";
+                                            _phone = "";
+                                            _email = "";
+                                            _address = "";
+                                            _password = "";
                                           });
                                           Navigator.of(context).pushReplacement(
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       HomeScreen()));
                                         });
-                                        Scaffold.of(context)
+                                        ScaffoldMessenger.of(context)
                                             .showSnackBar(_success);
                                       }
                                     },
@@ -241,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: const EdgeInsets.all(25.0),
                             child: Container(
                                 width: width * 0.1,
-                                height: height * 0.05,
+                                height: height * 0.06,
                                 decoration: BoxDecoration(
                                     border: const GradientBoxBorder(
                                       gradient: LinearGradient(colors: [
@@ -260,7 +308,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               builder: (context, AsyncSnapshot snapshot) {
                                 if (snapshot.hasData) {
                                   return Container(
-                                      height: height * 0.4,
+                                      height: height * 0.5,
                                       child: GridView.builder(
                                         scrollDirection: Axis.vertical,
                                         itemCount: snapshot.data.docs.length,
@@ -310,23 +358,50 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       Text(
                                                         snapshot
                                                             .data.docs[index]
-                                                            .data()['username'],
+                                                            .data()['username']
+                                                            .toString()
+                                                            .toUpperCase(),
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.white),
                                                       ),
-                                                      Text(
-                                                        snapshot
-                                                            .data.docs[index]
-                                                            .data()['email'],
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      )
+                                                      snapshot.data.docs[index]
+                                                                      .data()[
+                                                                  'role'] ==
+                                                              1
+                                                          ? Text(
+                                                              snapshot.data
+                                                                  .docs[index]
+                                                                  .data()[
+                                                                      'email']
+                                                                  .toString(),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            )
+                                                          : Text(
+                                                              snapshot.data
+                                                                  .docs[index]
+                                                                  .data()[
+                                                                      'phone']
+                                                                  .toString()
+                                                                  .replaceAllMapped(
+                                                                      RegExp(
+                                                                          r'(\d{3})(\d{3})(\d+)'),
+                                                                      (Match m) =>
+                                                                          "(${m[1]}) ${m[2]}-${m[3]}"),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            )
                                                     ],
                                                   ),
                                                 ),

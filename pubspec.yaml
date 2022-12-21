@@ -13,26 +13,29 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  #carousel_slider: ^4.0.0-nullsafety.0
   firebase_core: ^1.0.0
   firebase_auth: 
-  #firebase_auth: ^1.0.0
   barcode_widget:
   gradient_borders: ^0.2.0
+  modal_bottom_sheet:
   intl: ^0.17.0
-  #firebase_storage: ^8.0.0
+  http:
+  syncfusion_flutter_pdfviewer: ^20.2.45
   cloud_firestore: ^1.0.0
   file_picker:
-  #cloud_firestore: ^3.0.0
   shared_preferences:
   carousel_slider: ^4.1.1
   firebase_storage: ^9.0.0
   image_picker: ^0.7.0
-  uuid: 3.0.0
+  uuid: 
   firebase: ^9.0.0
   easy_dynamic_theme: ^2.0.0
   google_sign_in: ^5.0.1
   countup: ^0.1.4
+  path_provider:
+  open_file: 
+
+
   
 
 
@@ -48,7 +51,7 @@ flutter:
       fonts:
         - asset: fonts/Montserrat-Regular.ttf
 
-    - family: Electrolize
+    - family: Electrolize=
       fonts:
         - asset: fonts/Electrolize-Regular.ttf
 

@@ -38,6 +38,7 @@ class _AddProductState extends State<AddProduct> {
   TextEditingController descA = TextEditingController();
   TextEditingController cPrice = TextEditingController();
   TextEditingController rPrice = TextEditingController();
+  TextEditingController oPrice = TextEditingController();
   TextEditingController wPrice = TextEditingController();
   late String randomNumber;
   var uuid = Uuid();
@@ -697,7 +698,7 @@ class _AddProductState extends State<AddProduct> {
                                                 .validate()) {
                                               if (categoryID.isEmpty ||
                                                   image.isEmpty) {
-                                                Scaffold.of(context)
+                                                ScaffoldMessenger.of(context)
                                                     .showSnackBar(_missingData);
                                               } else {
                                                 menuProducts
@@ -730,10 +731,14 @@ class _AddProductState extends State<AddProduct> {
                                                   "pdfUrl": pdfurl.toString(),
                                                   'quantity': int.parse(
                                                       quantity.text.toString()),
-                                                  'cost price': cPrice.text,
-                                                  'retail price': rPrice.text,
+                                                  'cost price':
+                                                      int.parse(cPrice.text),
+                                                  'retail price':
+                                                      int.parse(rPrice.text),
+                                                  'old price':
+                                                      int.parse(oPrice.text),
                                                   'wholesale price':
-                                                      wPrice.text,
+                                                      int.parse(wPrice.text),
                                                   "Time": DateTime.now(),
                                                   "img": image,
 
@@ -749,7 +754,9 @@ class _AddProductState extends State<AddProduct> {
                                                   cPrice.text = '';
                                                   wPrice.text = '';
                                                   images = [];
+                                                  pdfLoading = false;
                                                   rPrice.text = '';
+                                                  oPrice.text = '';
                                                   image = '';
                                                   brand.text = '';
                                                   oemCode.text = '';
@@ -761,7 +768,7 @@ class _AddProductState extends State<AddProduct> {
 
                                                   randomNumber = uuid.v1();
                                                 });
-                                                Scaffold.of(context)
+                                                ScaffoldMessenger.of(context)
                                                     .showSnackBar(_success);
                                               }
                                             }
@@ -1130,7 +1137,7 @@ class _AddProductState extends State<AddProduct> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Container(
-                                          width: width * 0.15,
+                                          width: width * 0.1,
                                           child: TextFormField(
                                             keyboardType: TextInputType.number,
                                             controller: cPrice,
@@ -1152,7 +1159,29 @@ class _AddProductState extends State<AddProduct> {
                                           ),
                                         ),
                                         Container(
-                                          width: width * 0.15,
+                                          width: width * 0.1,
+                                          child: TextFormField(
+                                            keyboardType: TextInputType.number,
+                                            controller: oPrice,
+                                            validator: (val) {
+                                              if (val!.isEmpty) {
+                                                return "Enter price";
+                                              } else {
+                                                return null;
+                                              }
+                                            },
+                                            decoration: InputDecoration(
+                                              hintText: 'Old Price',
+                                              labelText: 'Old Price',
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(6.0),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: width * 0.1,
                                           child: TextFormField(
                                             keyboardType: TextInputType.number,
                                             controller: rPrice,
@@ -1174,7 +1203,7 @@ class _AddProductState extends State<AddProduct> {
                                           ),
                                         ),
                                         Container(
-                                          width: width * 0.15,
+                                          width: width * 0.1,
                                           child: TextFormField(
                                             keyboardType: TextInputType.number,
                                             controller: wPrice,
@@ -1196,7 +1225,7 @@ class _AddProductState extends State<AddProduct> {
                                           ),
                                         ),
                                         Container(
-                                          width: width * 0.15,
+                                          width: width * 0.1,
                                           child: TextFormField(
                                             keyboardType: TextInputType.number,
                                             controller: quantity,
@@ -1258,7 +1287,7 @@ class _AddProductState extends State<AddProduct> {
     selectImage(onSelected: (file) async {
       fb.StorageReference storageRef = fb
           .storage()
-          .refFromURL('gs://resturant-management-f42e5.appspot.com')
+          .refFromURL('gs://baharka-library-e410f.appspot.com')
           .child(path);
       fb.UploadTaskSnapshot uploadTaskSnapshot =
           await storageRef.put(file).future;
@@ -1298,7 +1327,7 @@ class _AddProductState extends State<AddProduct> {
     selectPDF(onSelected: (file) async {
       fb.StorageReference storageRef = fb
           .storage()
-          .refFromURL('gs://resturant-management-f42e5.appspot.com')
+          .refFromURL('gs://baharka-library-e410f.appspot.com')
           .child(path);
       fb.UploadTaskSnapshot uploadTaskSnapshot =
           await storageRef.put(file).future;
