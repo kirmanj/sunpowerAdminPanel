@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:cross_file/cross_file.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:explore/pdfread.dart';
-import 'package:explore/web/widgets/responsive.dart';
+import 'package:explore/web/responsive.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
