@@ -45,8 +45,11 @@ class _AddBrandState extends State<AddBrand> {
 
         brands.add({
           "name": element.data()['name'],
+          "nameA": element.data()['nameA'],
+          "nameK": element.data()['nameK'],
           'image': element.data()['img'],
-          'pdf': element.data()['pdfurl']
+          'pdf': element.data()['pdfurl'],
+          'id': element.id
         });
       });
       if (_isSelected.length != 0) {
@@ -87,20 +90,35 @@ class _AddBrandState extends State<AddBrand> {
                     //mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(25.0),
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.05,
-                            decoration: BoxDecoration(
-                                border: const GradientBoxBorder(
-                                  gradient: LinearGradient(colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ]),
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(5)),
-                            child: Center(child: Text('Brand Panel'))),
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          children: [
+                            InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Color.fromARGB(255, 13, 143, 136),
+                                )),
+                            SizedBox(
+                              width: width * 0.4,
+                            ),
+                            Container(
+                                width: width * 0.1,
+                                height: height * 0.05,
+                                decoration: BoxDecoration(
+                                    border: const GradientBoxBorder(
+                                      gradient: LinearGradient(colors: [
+                                        Color.fromARGB(255, 0, 178, 169),
+                                        Color.fromARGB(255, 0, 106, 101),
+                                      ]),
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Center(child: Text('Web Brand Panel'))),
+                          ],
+                        ),
                       ),
                       Container(
                         child: Row(
@@ -258,72 +276,63 @@ class _AddBrandState extends State<AddBrand> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Expanded(
-                                      flex: 1,
-                                      child: TextFormField(
-                                        controller: name,
-                                        validator: (val) {
-                                          if (val!.isEmpty) {
-                                            return "Enter Product Name";
-                                          } else {
-                                            return null;
-                                          }
-                                        },
-                                        decoration: InputDecoration(
-                                          hintText: 'Name',
-                                          labelText: 'Name',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(6.0),
-                                          ),
+                                    child: TextFormField(
+                                      controller: name,
+                                      validator: (val) {
+                                        if (val!.isEmpty) {
+                                          return "Enter Product Name";
+                                        } else {
+                                          return null;
+                                        }
+                                      },
+                                      decoration: InputDecoration(
+                                        hintText: 'Name',
+                                        labelText: 'Name',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(6.0),
                                         ),
                                       ),
                                     ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Expanded(
-                                      flex: 1,
-                                      child: TextFormField(
-                                        controller: nameK,
-                                        validator: (val) {
-                                          if (val!.isEmpty) {
-                                            return "ناوی کاڵاکە بنووسە";
-                                          } else {
-                                            return null;
-                                          }
-                                        },
-                                        decoration: InputDecoration(
-                                          hintText: 'ناو',
-                                          labelText: 'ناو',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5.0),
-                                          ),
+                                    child: TextFormField(
+                                      controller: nameK,
+                                      validator: (val) {
+                                        if (val!.isEmpty) {
+                                          return "ناوی کاڵاکە بنووسە";
+                                        } else {
+                                          return null;
+                                        }
+                                      },
+                                      decoration: InputDecoration(
+                                        hintText: 'ناو',
+                                        labelText: 'ناو',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5.0),
                                         ),
                                       ),
                                     ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Expanded(
-                                      flex: 1,
-                                      child: TextFormField(
-                                        controller: nameA,
-                                        validator: (val) {
-                                          if (val!.isEmpty) {
-                                            return "اكتب اسم البضاعة";
-                                          } else {
-                                            return null;
-                                          }
-                                        },
-                                        decoration: InputDecoration(
-                                          hintText: 'اسم',
-                                          labelText: 'اسم',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(6.0),
-                                          ),
+                                    child: TextFormField(
+                                      controller: nameA,
+                                      validator: (val) {
+                                        if (val!.isEmpty) {
+                                          return "اكتب اسم البضاعة";
+                                        } else {
+                                          return null;
+                                        }
+                                      },
+                                      decoration: InputDecoration(
+                                        hintText: 'اسم',
+                                        labelText: 'اسم',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(6.0),
                                         ),
                                       ),
                                     ),
@@ -374,12 +383,9 @@ class _AddBrandState extends State<AddBrand> {
                                         } else {
                                           brandsLink.doc(randomNumber).set({
                                             "pdfurl": pdfurl,
-
                                             'name': name.text,
-
                                             'nameK': nameK.text,
                                             'nameA': nameA.text,
-
                                             "Time": DateTime.now(),
                                             "img": image,
 
@@ -398,6 +404,7 @@ class _AddBrandState extends State<AddBrand> {
                                           });
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(_success);
+                                          Navigator.pop(context);
                                         }
                                       }
                                     },

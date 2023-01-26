@@ -1,6 +1,7 @@
 import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:explore/homeScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 // ignore: deprecated_member_use
@@ -9,10 +10,11 @@ import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import 'package:uuid/uuid.dart';
 
 class AddModel extends StatefulWidget {
-  const AddModel({Key? key}) : super(key: key);
+  List<dynamic> categories = [];
+  AddModel(this.categories) : super();
 
   @override
-  _AddCategoryState createState() => _AddCategoryState();
+  _AddCategoryState createState() => _AddCategoryState(this.categories);
 }
 
 final _formKey = GlobalKey<FormState>();
@@ -29,51 +31,96 @@ class _AddCategoryState extends State<AddModel> {
   late String randomNumber;
   final categoryCollection = FirebaseFirestore.instance.collection('make');
 
-  CollectionReference model = FirebaseFirestore.instance
-      .collection("make")
-      .doc("0b431ae0-3ec5-11ed-b639-57f35904df14")
-      .collection('models');
   var uuid = Uuid();
+
   List<dynamic> categories = [];
   dynamic selectedCategory;
   bool imgLoad = false;
+  String selectedModelId = '';
+
+  _AddCategoryState(this.categories);
+
+  bool makeEdit = false;
+  bool modelEdit = false;
 
   getCats() async {
-    FirebaseFirestore.instance.collection("make").get().then((value) {
-      int i = 0;
-      setState(() {
-        categories = value.docs;
-      });
-      value.docs.forEach((element) async {
-        Reference storage =
-            FirebaseStorage.instance.ref().child(element['img']);
-        String url = await storage.getDownloadURL();
-        if (element['make'] == categories[0]['make']) {
-          setState(() {
-            selectedCategory = element;
-          });
-        }
-        setState(() {
-          categories[i] = {
-            'make': element['make'],
-            'img': url,
-            'id': element.id
-          };
-        });
-
-        i++;
-      });
-
-      if (i + 1 == value.docs.length) {
-        setState(() {
-          imgLoad = true;
-        });
-      }
+    setState(() {
+      selectedCategory = categories[0];
     });
+    setState(() {
+      imgLoad = true;
+    });
+    // FirebaseFirestore.instance.collection("make").get().then((value) {
+    //   int i = 0;
+    //   setState(() {
+    //     categories = value.docs;
+    //   });
+    //   value.docs.forEach((element) async {
+    //     Reference storage =
+    //         FirebaseStorage.instance.ref().child(element['img']);
+    //     String url = await storage.getDownloadURL();
+    //     if (element['make'] == categories[0]['make']) {
+    //       setState(() {
+    //         selectedCategory = element;
+    //       });
+    //     }
+    //     setState(() {
+    //       categories[i] = {
+    //         'make': element['make'],
+    //         'img': url,
+    //         'id': element.id
+    //       };
+    //     });
+
+    //     i++;
+    //   });
+
+    //   if (i + 1 == value.docs.length) {
+
+    //   }
+    // });
   }
+  // List<dynamic> categories = [];
+  // dynamic selectedCategory;
+  // bool imgLoad = false;
+
+  // getCats() async {
+  //   FirebaseFirestore.instance.collection("make").get().then((value) {
+  //     int i = 0;
+  //     setState(() {
+  //       categories = value.docs;
+  //     });
+  //     value.docs.forEach((element) async {
+  //       Reference storage =
+  //           FirebaseStorage.instance.ref().child(element['img']);
+  //       String url = await storage.getDownloadURL();
+  //       if (element['make'] == categories[0]['make']) {
+  //         setState(() {
+  //           selectedCategory = element;
+  //         });
+  //       }
+  //       setState(() {
+  //         categories[i] = {
+  //           'make': element['make'],
+  //           'img': url,
+  //           'id': element.id
+  //         };
+  //       });
+
+  //       i++;
+  //     });
+
+  //     if (i + 1 == value.docs.length) {
+  //       setState(() {
+  //         imgLoad = true;
+  //       });
+  //     }
+  //   });
+  // }
 
   void initState() {
     getCats();
+
     super.initState();
     randomNumber = uuid.v1();
   }
@@ -92,19 +139,34 @@ class _AddCategoryState extends State<AddModel> {
                 child: Container(
                   child: Column(
                     children: [
-                      Container(
-                          width: width * 0.1,
-                          height: height * 0.05,
-                          decoration: BoxDecoration(
-                              border: const GradientBoxBorder(
-                                gradient: LinearGradient(colors: [
-                                  Color.fromARGB(255, 0, 178, 169),
-                                  Color.fromARGB(255, 0, 106, 101),
-                                ]),
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Center(child: Text('Categories Panel'))),
+                      Row(
+                        children: [
+                          InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                color: Color.fromARGB(255, 13, 143, 136),
+                              )),
+                          SizedBox(
+                            width: width * 0.4,
+                          ),
+                          Container(
+                              width: width * 0.1,
+                              height: height * 0.05,
+                              decoration: BoxDecoration(
+                                  border: const GradientBoxBorder(
+                                    gradient: LinearGradient(colors: [
+                                      Color.fromARGB(255, 0, 178, 169),
+                                      Color.fromARGB(255, 0, 106, 101),
+                                    ]),
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: Center(child: Text('Models Panel'))),
+                        ],
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -288,9 +350,31 @@ class _AddCategoryState extends State<AddModel> {
                                                         width: width * 0.1,
                                                         child: InkWell(
                                                             onTap: () {
+                                                              if (makeEdit) {
+                                                                categoryCollection
+                                                                    .doc(selectedCategory[
+                                                                        'id'])
+                                                                    .update({
+                                                                  'make':
+                                                                      name.text,
+                                                                  'makeK': nameK
+                                                                      .text,
+                                                                  'makeA': nameA
+                                                                      .text,
+
+                                                                  "Time":
+                                                                      DateTime
+                                                                          .now(),
+
+                                                                  // "Time": DateTime.now(),// John Doe
+                                                                });
+                                                                Navigator.pop(
+                                                                    context);
+                                                              }
                                                               if (_formKey
-                                                                  .currentState!
-                                                                  .validate()) {
+                                                                      .currentState!
+                                                                      .validate() &&
+                                                                  !makeEdit) {
                                                                 if (image
                                                                     .isEmpty) {
                                                                   ScaffoldMessenger.of(
@@ -318,6 +402,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                         image,
                                                                     // "Time": DateTime.now(),// John Doe
                                                                   });
+
                                                                   setState(() {
                                                                     name.text =
                                                                         '';
@@ -335,6 +420,8 @@ class _AddCategoryState extends State<AddModel> {
                                                                           context)
                                                                       .showSnackBar(
                                                                           _success);
+                                                                  Navigator.pop(
+                                                                      context);
                                                                 }
                                                               }
                                                             },
@@ -365,8 +452,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                               .centerRight,
                                                                         ),
                                                                         borderRadius:
-                                                                            const BorderRadius
-                                                                                .all(
+                                                                            const BorderRadius.all(
                                                                           Radius.circular(
                                                                               25.0),
                                                                         ),
@@ -385,13 +471,15 @@ class _AddCategoryState extends State<AddModel> {
                                                                       )
                                                                     ]),
                                                                 child: Center(
-                                                                    child: Text(
-                                                                        'ADD',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Colors.white,
-                                                                        ))))),
+                                                                    child: makeEdit
+                                                                        ? Text('Done',
+                                                                            style: TextStyle(
+                                                                              color: Colors.white,
+                                                                            ))
+                                                                        : Text('ADD',
+                                                                            style: TextStyle(
+                                                                              color: Colors.white,
+                                                                            ))))),
                                                       ),
                                                     ],
                                                   ),
@@ -485,7 +573,54 @@ class _AddCategoryState extends State<AddModel> {
                                                                               child: Container(
                                                                                 width: width * 0.1,
                                                                                 height: width * 0.1,
-                                                                                child: Image.network(categories[index]['img'].toString()),
+                                                                                child: Stack(
+                                                                                  children: [
+                                                                                    Container(
+                                                                                      width: width * 0.1,
+                                                                                      height: height * 0.1,
+                                                                                      child: Image.network(categories[index]['img'].toString()),
+                                                                                    ),
+                                                                                    Positioned(
+                                                                                        bottom: 0,
+                                                                                        child: Container(
+                                                                                          //   width: width * 0.08,
+                                                                                          child: Row(
+                                                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                                                            children: [
+                                                                                              IconButton(
+                                                                                                  onPressed: () {
+                                                                                                    setState(() {
+                                                                                                      makeEdit = true;
+
+                                                                                                      selectedCategory = categories[index];
+
+                                                                                                      name.text = categories[index]['make'].toString();
+                                                                                                      nameA.text = categories[index]['makeA'].toString();
+                                                                                                      nameK.text = categories[index]['makeK'].toString();
+                                                                                                      img = categories[index]['img'].toString();
+                                                                                                    });
+                                                                                                  },
+                                                                                                  icon: Icon(
+                                                                                                    Icons.edit,
+                                                                                                    size: 16,
+                                                                                                  )),
+                                                                                              IconButton(
+                                                                                                  onPressed: () {
+                                                                                                    print(selectedCategory['id']);
+                                                                                                    print(selectedModelId);
+                                                                                                    categoryCollection.doc(selectedCategory['id']).delete();
+                                                                                                    ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                                                    Navigator.pop(context);
+                                                                                                  },
+                                                                                                  icon: Icon(
+                                                                                                    Icons.delete,
+                                                                                                    size: 16,
+                                                                                                  ))
+                                                                                            ],
+                                                                                          ),
+                                                                                        ))
+                                                                                  ],
+                                                                                ),
                                                                               ),
                                                                             )),
                                                                       ),
@@ -683,13 +818,36 @@ class _AddCategoryState extends State<AddModel> {
                                                                       0.1,
                                                                   child: InkWell(
                                                                       onTap: () {
-                                                                        if (_formKey2
-                                                                            .currentState!
-                                                                            .validate()) {
+                                                                        if (modelEdit) {
                                                                           FirebaseFirestore
                                                                               .instance
                                                                               .collection('make')
-                                                                              .doc(selectedCategory.id)
+                                                                              .doc(selectedCategory['id'])
+                                                                              .collection('models')
+                                                                              .doc(selectedModelId)
+                                                                              .update({
+                                                                            'mname':
+                                                                                mname.text,
+                                                                            'mnameK':
+                                                                                mnameK.text,
+                                                                            'mnameA':
+                                                                                mnameA.text,
+
+                                                                            "Time":
+                                                                                DateTime.now(),
+
+                                                                            // "Time": DateTime.now(),// John Doe
+                                                                          });
+
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        }
+                                                                        if (_formKey2.currentState!.validate() &&
+                                                                            !modelEdit) {
+                                                                          FirebaseFirestore
+                                                                              .instance
+                                                                              .collection('make')
+                                                                              .doc(selectedCategory['id'])
                                                                               .collection('models')
                                                                               .doc()
                                                                               .set({
@@ -744,10 +902,15 @@ class _AddCategoryState extends State<AddModel> {
                                                                                 )
                                                                               ]),
                                                                           child: Center(
-                                                                              child: Text('ADD',
-                                                                                  style: TextStyle(
-                                                                                    color: Colors.white,
-                                                                                  ))))),
+                                                                              child: modelEdit
+                                                                                  ? Text('Done',
+                                                                                      style: TextStyle(
+                                                                                        color: Colors.white,
+                                                                                      ))
+                                                                                  : Text('ADD',
+                                                                                      style: TextStyle(
+                                                                                        color: Colors.white,
+                                                                                      ))))),
                                                                 ),
                                                               ],
                                                             ),
@@ -787,16 +950,14 @@ class _AddCategoryState extends State<AddModel> {
                                                                 .collection(
                                                                     'make')
                                                                 .doc(
-                                                                    selectedCategory
-                                                                        .id)
+                                                                    selectedCategory[
+                                                                        'id'])
                                                                 .collection(
                                                                     "models")
                                                                 .snapshots(),
                                                             builder: (context,
                                                                 AsyncSnapshot
                                                                     snapshot) {
-                                                              print("test");
-
                                                               if (snapshot
                                                                   .hasData) {
                                                                 return Container(
@@ -813,44 +974,98 @@ class _AddCategoryState extends State<AddModel> {
                                                                       (context,
                                                                           index) {
                                                                     return Padding(
-                                                                        padding: EdgeInsets.only(
-                                                                            top:
-                                                                                15,
-                                                                            left:
-                                                                                15.0,
-                                                                            right:
-                                                                                15),
+                                                                      padding: EdgeInsets.only(
+                                                                          top:
+                                                                              15,
+                                                                          left:
+                                                                              15.0,
+                                                                          right:
+                                                                              15),
+                                                                      child:
+                                                                          Card(
+                                                                        elevation:
+                                                                            5,
+                                                                        color: Colors
+                                                                            .white,
                                                                         child:
                                                                             Container(
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color:
-                                                                                Colors.white,
-                                                                            borderRadius: BorderRadius.only(
-                                                                                topLeft: Radius.circular(10),
-                                                                                topRight: Radius.circular(10),
-                                                                                bottomLeft: Radius.circular(10),
-                                                                                bottomRight: Radius.circular(10)),
-                                                                            boxShadow: [
-                                                                              BoxShadow(
-                                                                                color: Colors.grey.withOpacity(0.5),
-                                                                                spreadRadius: 1,
-                                                                                blurRadius: 2,
-                                                                                offset: Offset(0, 0), // changes position of shadow
-                                                                              ),
-                                                                            ],
-                                                                          ),
+                                                                          height:
+                                                                              height * 0.15,
+                                                                          // decoration:
+                                                                          //     BoxDecoration(
+                                                                          //   color:
+                                                                          //       Colors.white,
+                                                                          //   borderRadius: BorderRadius.only(
+                                                                          //       topLeft: Radius.circular(10),
+                                                                          //       topRight: Radius.circular(10),
+                                                                          //       bottomLeft: Radius.circular(10),
+                                                                          //       bottomRight: Radius.circular(10)),
+                                                                          //   boxShadow: [
+                                                                          //     BoxShadow(
+                                                                          //       color: Colors.grey.withOpacity(0.5),
+                                                                          //       spreadRadius: 1,
+                                                                          //       blurRadius: 2,
+                                                                          //       offset: Offset(0, 0), // changes position of shadow
+                                                                          //     ),
+                                                                          //   ],
+                                                                          // ),
                                                                           margin:
                                                                               EdgeInsets.only(bottom: 15),
-                                                                          child:
-                                                                              Center(
-                                                                            child:
-                                                                                Text(
-                                                                              snapshot.data.docs[index].data()['mname'],
-                                                                              textAlign: TextAlign.center,
-                                                                            ),
-                                                                          ),
-                                                                        ));
+                                                                          child: Center(
+                                                                              child: Column(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.start,
+                                                                            children: [
+                                                                              Expanded(
+                                                                                flex: 1,
+                                                                                child: Center(
+                                                                                  child: Text(
+                                                                                    snapshot.data.docs[index].data()['mname'],
+                                                                                    textAlign: TextAlign.center,
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              Expanded(
+                                                                                flex: 1,
+                                                                                //   width: width * 0.08,
+                                                                                child: Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    IconButton(
+                                                                                        onPressed: () {
+                                                                                          setState(() {
+                                                                                            modelEdit = true;
+
+                                                                                            mname.text = snapshot.data.docs[index].data()['mname'].toString();
+                                                                                            mnameA.text = snapshot.data.docs[index].data()['mnameA'].toString();
+                                                                                            mnameK.text = snapshot.data.docs[index].data()['mnameK'].toString();
+                                                                                            selectedModelId = snapshot.data.docs[index].id.toString();
+                                                                                          });
+                                                                                        },
+                                                                                        icon: Icon(
+                                                                                          Icons.edit,
+                                                                                          size: 16,
+                                                                                        )),
+                                                                                    IconButton(
+                                                                                        onPressed: () {
+                                                                                          print(selectedCategory['id']);
+                                                                                          print(selectedModelId);
+                                                                                          categoryCollection.doc(selectedCategory['id']).collection("models").doc(snapshot.data.docs[index].id).delete();
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                                          Navigator.pop(context);
+                                                                                        },
+                                                                                        icon: Icon(
+                                                                                          Icons.delete,
+                                                                                          size: 16,
+                                                                                        ))
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          )),
+                                                                        ),
+                                                                      ),
+                                                                    );
                                                                   },
                                                                   gridDelegate:
                                                                       SliverGridDelegateWithFixedCrossAxisCount(
@@ -935,6 +1150,20 @@ class _AddCategoryState extends State<AddModel> {
   final _success = SnackBar(
     content: Text(
       'Added Successfully',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 17,
+      ),
+    ),
+    backgroundColor: Colors.green,
+    duration: Duration(seconds: 3),
+  );
+
+  final _delete = SnackBar(
+    content: Text(
+      'Deleted Successfully',
       textAlign: TextAlign.center,
       style: TextStyle(
         color: Colors.white,

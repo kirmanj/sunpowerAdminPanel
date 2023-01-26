@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:html' as html;
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:explore/pdfread.dart';
@@ -65,16 +66,35 @@ class _DestinationCarouselState extends State<DestinationCarousel> {
             ),
           )
           .toList();
-      ;
     } else {
       return brands
           .map(
-            (element) => ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(
-                element['image'],
-                fit: BoxFit.cover,
-              ),
+            (element) => Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.network(
+                    element['image'],
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                    top: 5,
+                    right: 5,
+                    child: Container(
+                      child: IconButton(
+                          onPressed: () {
+                            print("krmanj");
+                            print(element['id']);
+                            FirebaseFirestore.instance
+                                .collection("brand")
+                                .doc(element['id'])
+                                .delete();
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(Icons.delete)),
+                    ))
+              ],
             ),
           )
           .toList();
@@ -86,8 +106,12 @@ class _DestinationCarouselState extends State<DestinationCarousel> {
       var storage = FirebaseStorage.instance.ref().child(element['image']);
       String url = await storage.getDownloadURL();
       setState(() {
-        brands.add(
-            {"image": url, 'name': element['name'], 'pdf': element['pdf']});
+        brands.add({
+          "image": url,
+          'name': element['name'],
+          'pdf': element['pdf'],
+          'id': element['id']
+        });
       });
     });
   }
@@ -153,29 +177,6 @@ class _DestinationCarouselState extends State<DestinationCarousel> {
                             fontFamily: 'Electrolize',
                             fontSize: screenSize.width / 25,
                             color: Colors.white,
-                          ),
-                        ),
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          onHover: (value) {},
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ReadPDF(
-                                          brands[_current]['pdf'],
-                                          brands[_current]['name'],
-                                        )));
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                                top: screenSize.height / 80,
-                                bottom: screenSize.height / 90),
-                            child: Icon(
-                              Icons.picture_as_pdf,
-                              size: 16,
-                              color: Colors.white,
-                            ),
                           ),
                         ),
                       ],

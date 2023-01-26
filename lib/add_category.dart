@@ -21,27 +21,36 @@ class _AddCategoryState extends State<AddCategory> {
   TextEditingController name = TextEditingController();
   TextEditingController nameK = TextEditingController();
   TextEditingController nameA = TextEditingController();
+
+  String selectedCategory = '';
+  bool categoryEdit = false;
   late String randomNumber;
   final categoryCollection =
       FirebaseFirestore.instance.collection('categories');
   var uuid = Uuid();
   List<dynamic> categories = [];
+  List<dynamic> categoriesTemp = [];
   bool imgLoad = false;
   getCats() async {
     FirebaseFirestore.instance.collection("categories").get().then((value) {
       int i = 0;
       setState(() {
-        categories = value.docs;
+        categoriesTemp = value.docs;
       });
       value.docs.forEach((element) async {
         Reference storage =
             FirebaseStorage.instance.ref().child(element['img']);
         String url = await storage.getDownloadURL();
         setState(() {
-          categories[i] = {'name': element['name'], 'img': url};
+          categories.add({
+            'name': element['name'],
+            'nameA': element['nameA'],
+            'nameK': element['nameK'],
+            'img': url,
+            'id': element.id
+          });
         });
 
-        print(url);
         i++;
       });
 
@@ -73,19 +82,34 @@ class _AddCategoryState extends State<AddCategory> {
                 child: Container(
                   child: Column(
                     children: [
-                      Container(
-                          width: width * 0.1,
-                          height: height * 0.05,
-                          decoration: BoxDecoration(
-                              border: const GradientBoxBorder(
-                                gradient: LinearGradient(colors: [
-                                  Color.fromARGB(255, 0, 178, 169),
-                                  Color.fromARGB(255, 0, 106, 101),
-                                ]),
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Center(child: Text('Categories Panel'))),
+                      Row(
+                        children: [
+                          InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                color: Color.fromARGB(255, 13, 143, 136),
+                              )),
+                          SizedBox(
+                            width: width * 0.4,
+                          ),
+                          Container(
+                              width: width * 0.1,
+                              height: height * 0.05,
+                              decoration: BoxDecoration(
+                                  border: const GradientBoxBorder(
+                                    gradient: LinearGradient(colors: [
+                                      Color.fromARGB(255, 0, 178, 169),
+                                      Color.fromARGB(255, 0, 106, 101),
+                                    ]),
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: Center(child: Text('Categories Panel'))),
+                        ],
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -257,10 +281,22 @@ class _AddCategoryState extends State<AddCategory> {
                                     ),
                                     InkWell(
                                         onTap: () {
+                                          if (categoryEdit) {
+                                            categoryCollection
+                                                .doc(selectedCategory)
+                                                .update({
+                                              'name': name.text,
+                                              'nameK': nameK.text,
+                                              'nameA': nameA.text,
+
+                                              // "Time": DateTime.now(),// John Doe
+                                            });
+                                            Navigator.pop(context);
+                                          }
                                           if (_formKey.currentState!
-                                              .validate()) {
+                                                  .validate() &&
+                                              !categoryEdit) {
                                             if (image.isEmpty) {
-                                              print('select category or Image');
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(_missingData);
                                             } else {
@@ -287,6 +323,7 @@ class _AddCategoryState extends State<AddCategory> {
                                               });
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(_success);
+                                              Navigator.pop(context);
                                             }
                                           }
                                         },
@@ -318,10 +355,15 @@ class _AddCategoryState extends State<AddCategory> {
                                                   )
                                                 ]),
                                             child: Center(
-                                                child: Text('ADD',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                    ))))),
+                                                child: categoryEdit
+                                                    ? Text('Done',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ))
+                                                    : Text('ADD',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ))))),
 
                                     SizedBox(
                                       height: 30,
@@ -390,60 +432,118 @@ class _AddCategoryState extends State<AddCategory> {
                                                                 top: 15,
                                                                 left: 15.0,
                                                                 right: 15),
-                                                        child: Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius: BorderRadius.only(
-                                                                topLeft: Radius
-                                                                    .circular(
-                                                                        10),
-                                                                topRight: Radius
-                                                                    .circular(
-                                                                        10),
-                                                                bottomLeft: Radius
-                                                                    .circular(
-                                                                        10),
-                                                                bottomRight: Radius
-                                                                    .circular(
-                                                                        10)),
-                                                            boxShadow: [
-                                                              BoxShadow(
+                                                        child: Stack(
+                                                          children: [
+                                                            Container(
+                                                              decoration:
+                                                                  BoxDecoration(
                                                                 color: Colors
-                                                                    .grey
-                                                                    .withOpacity(
-                                                                        0.5),
-                                                                spreadRadius: 1,
-                                                                blurRadius: 2,
-                                                                offset: Offset(
-                                                                    0,
-                                                                    0), // changes position of shadow
+                                                                    .white,
+                                                                borderRadius: BorderRadius.only(
+                                                                    topLeft: Radius
+                                                                        .circular(
+                                                                            10),
+                                                                    topRight: Radius
+                                                                        .circular(
+                                                                            10),
+                                                                    bottomLeft:
+                                                                        Radius.circular(
+                                                                            10),
+                                                                    bottomRight:
+                                                                        Radius.circular(
+                                                                            10)),
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .withOpacity(
+                                                                            0.5),
+                                                                    spreadRadius:
+                                                                        1,
+                                                                    blurRadius:
+                                                                        2,
+                                                                    offset: Offset(
+                                                                        0,
+                                                                        0), // changes position of shadow
+                                                                  ),
+                                                                ],
                                                               ),
-                                                            ],
-                                                          ),
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  bottom: 15),
-                                                          child: ListTile(
-                                                              subtitle: Text(
-                                                                categories[
-                                                                        index]
-                                                                    ['name'],
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              ),
-                                                              title: Container(
-                                                                width:
-                                                                    width * 0.1,
-                                                                height:
-                                                                    width * 0.1,
-                                                                child: Image.network(
-                                                                    categories[index]
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      bottom:
+                                                                          15),
+                                                              child: ListTile(
+                                                                  subtitle:
+                                                                      Text(
+                                                                    categories[
+                                                                            index]
+                                                                        [
+                                                                        'name'],
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                  ),
+                                                                  title:
+                                                                      Container(
+                                                                    width:
+                                                                        width *
+                                                                            0.1,
+                                                                    height:
+                                                                        width *
+                                                                            0.1,
+                                                                    child: Image.network(categories[index]
                                                                             [
                                                                             'img']
                                                                         .toString()),
-                                                              )),
+                                                                  )),
+                                                            ),
+                                                            Positioned(
+                                                                top: 0,
+                                                                right: 0,
+                                                                child:
+                                                                    Container(
+                                                                  //   width: width * 0.08,
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      IconButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            setState(() {
+                                                                              categoryEdit = true;
+
+                                                                              selectedCategory = categories[index]['id'].toString();
+                                                                              name.text = categories[index]['name'].toString();
+                                                                              nameA.text = categories[index]['nameA'].toString();
+                                                                              nameK.text = categories[index]['nameK'].toString();
+                                                                              img = categories[index]['img'].toString();
+                                                                            });
+                                                                          },
+                                                                          icon:
+                                                                              Icon(
+                                                                            Icons.edit,
+                                                                            size:
+                                                                                16,
+                                                                          )),
+                                                                      IconButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            categoryCollection.doc(categories[index]['id'].toString()).delete();
+                                                                            ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          icon:
+                                                                              Icon(
+                                                                            Icons.delete,
+                                                                            size:
+                                                                                16,
+                                                                          ))
+                                                                    ],
+                                                                  ),
+                                                                ))
+                                                          ],
                                                         ),
                                                       );
                                                     },
@@ -500,14 +600,12 @@ class _AddCategoryState extends State<AddCategory> {
           .child(path);
       var uploadTaskSnapshot = await storageRef.put(file).future;
       Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
-      print('urllllllll ${imageUri.toString()}');
 
       Future.delayed(Duration(milliseconds: 100), () {
         setState(() {
           image = imageUri.toString();
           loading = false;
           img = image.toString();
-          print('urlaaaaaa ${image.toString()}');
         });
       });
     });
@@ -516,6 +614,20 @@ class _AddCategoryState extends State<AddCategory> {
   String image = '';
 
   bool loading = false;
+
+  final _delete = SnackBar(
+    content: Text(
+      'Deleted Successfully',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 17,
+      ),
+    ),
+    backgroundColor: Colors.green,
+    duration: Duration(seconds: 3),
+  );
 
   final _success = SnackBar(
     content: Text(

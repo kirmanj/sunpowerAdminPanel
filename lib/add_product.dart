@@ -3,6 +3,7 @@ import 'dart:html';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:explore/homeScreen.dart';
 import 'package:explore/ppdfView.dart';
 
 import 'package:file_picker/file_picker.dart';
@@ -150,23 +151,7 @@ class _AddProductState extends State<AddProduct> {
   @override
   void initState() {
     // TODO: implement initState
-    // FirebaseFirestore.instance
-    //     .collection('products')
-    //     .doc("1e9f5ca0-3f99-11ed-8c22-7bde08f9388e")
-    //     .get()
-    //     .then((value) {
-    //   print(value.get("name"));
-    //   name.text = value.get("name");
-    //   nameK.text = value.get("nameK");
-    //   nameA.text = value.get("nameA");
-    //   descE.text = value.get("desc");
-    //   descK.text = value.get("descK");
-    //   descA.text = value.get("descA");
-    //   cPrice.text = value.get("cost price");
-    //   wPrice.text = value.get("wholesale price");
-    //   rPrice.text = value.get("retail price");
-    //   image = value.get("img");
-    // });
+
     super.initState();
     getCategory();
     randomNumber = uuid.v1();
@@ -194,20 +179,38 @@ class _AddProductState extends State<AddProduct> {
                     //mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(25.0),
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.05,
-                            decoration: BoxDecoration(
-                                border: const GradientBoxBorder(
-                                  gradient: LinearGradient(colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ]),
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(5)),
-                            child: Center(child: Text('Product Panel'))),
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          children: [
+                            InkWell(
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => HomeScreen()));
+                                },
+                                child: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Color.fromARGB(255, 13, 143, 136),
+                                )),
+                            SizedBox(
+                              width: width * 0.4,
+                            ),
+                            Container(
+                                width: width * 0.1,
+                                height: height * 0.05,
+                                decoration: BoxDecoration(
+                                    border: const GradientBoxBorder(
+                                      gradient: LinearGradient(colors: [
+                                        Color.fromARGB(255, 0, 178, 169),
+                                        Color.fromARGB(255, 0, 106, 101),
+                                      ]),
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Center(child: Text('Product Panel'))),
+                          ],
+                        ),
                       ),
                       Container(
                         child: Row(

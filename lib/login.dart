@@ -14,6 +14,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
 
+  bool wholeSale = true;
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -26,19 +28,34 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.all(25.0),
-              child: Container(
-                  width: width * 0.1,
-                  height: height * 0.05,
-                  decoration: BoxDecoration(
-                      border: const GradientBoxBorder(
-                        gradient: LinearGradient(colors: [
-                          Color.fromARGB(255, 0, 178, 169),
-                          Color.fromARGB(255, 0, 106, 101),
-                        ]),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Center(child: Text('User Panel'))),
+              child: Row(
+                children: [
+                  InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: Color.fromARGB(255, 13, 143, 136),
+                      )),
+                  SizedBox(
+                    width: width * 0.4,
+                  ),
+                  Container(
+                      width: width * 0.1,
+                      height: height * 0.05,
+                      decoration: BoxDecoration(
+                          border: const GradientBoxBorder(
+                            gradient: LinearGradient(colors: [
+                              Color.fromARGB(255, 0, 178, 169),
+                              Color.fromARGB(255, 0, 106, 101),
+                            ]),
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Center(child: Text('Product Panel'))),
+                ],
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -285,26 +302,127 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(25.0),
-                            child: Container(
-                                width: width * 0.1,
-                                height: height * 0.06,
-                                decoration: BoxDecoration(
-                                    border: const GradientBoxBorder(
-                                      gradient: LinearGradient(colors: [
-                                        Color.fromARGB(255, 0, 178, 169),
-                                        Color.fromARGB(255, 0, 106, 101),
-                                      ]),
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: Center(child: Text('Wholesale Users'))),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    wholeSale = !wholeSale;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(25.0),
+                                  child: Container(
+                                      width: width * 0.1,
+                                      height: height * 0.06,
+                                      decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: !wholeSale
+                                                ? [
+                                                    Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                                    Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                                  ]
+                                                : [
+                                                    Color.fromARGB(
+                                                        255, 0, 178, 169),
+                                                    Color.fromARGB(
+                                                        255, 0, 106, 101),
+                                                  ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                          ),
+                                          border: wholeSale
+                                              ? null
+                                              : GradientBoxBorder(
+                                                  gradient:
+                                                      LinearGradient(colors: [
+                                                    Color.fromARGB(
+                                                        255, 0, 178, 169),
+                                                    Color.fromARGB(
+                                                        255, 0, 106, 101),
+                                                  ]),
+                                                  width: 1,
+                                                ),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: Center(
+                                          child: Text(
+                                        'Wholesale Users',
+                                        style: TextStyle(
+                                            color: !wholeSale
+                                                ? Colors.black
+                                                : Colors.white),
+                                      ))),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    wholeSale = !wholeSale;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(25.0),
+                                  child: Container(
+                                      width: width * 0.1,
+                                      height: height * 0.06,
+                                      decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: wholeSale
+                                                ? [
+                                                    Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                                    Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                                  ]
+                                                : [
+                                                    Color.fromARGB(
+                                                        255, 0, 178, 169),
+                                                    Color.fromARGB(
+                                                        255, 0, 106, 101),
+                                                  ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                          ),
+                                          border: !wholeSale
+                                              ? null
+                                              : GradientBoxBorder(
+                                                  gradient:
+                                                      LinearGradient(colors: [
+                                                    Color.fromARGB(
+                                                        255, 0, 178, 169),
+                                                    Color.fromARGB(
+                                                        255, 0, 106, 101),
+                                                  ]),
+                                                  width: 1,
+                                                ),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: Center(
+                                          child: Text(
+                                        'Normal Users',
+                                        style: TextStyle(
+                                            color: wholeSale
+                                                ? Colors.black
+                                                : Colors.white),
+                                      ))),
+                                ),
+                              ),
+                            ],
                           ),
                           StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection('users')
-                                  .snapshots(),
+                              stream: !wholeSale
+                                  ? FirebaseFirestore.instance
+                                      .collection('users')
+                                      .where("role", isEqualTo: 0)
+                                      .snapshots()
+                                  : FirebaseFirestore.instance
+                                      .collection('users')
+                                      .where("role", isEqualTo: 1)
+                                      .snapshots(),
                               builder: (context, AsyncSnapshot snapshot) {
                                 if (snapshot.hasData) {
                                   return Container(
@@ -313,8 +431,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                         scrollDirection: Axis.vertical,
                                         itemCount: snapshot.data.docs.length,
                                         itemBuilder: (context, index) {
-                                          print(snapshot.data.docs[index]
-                                              .data()['username']);
                                           return Padding(
                                               padding: EdgeInsets.only(
                                                   top: 15,
@@ -350,58 +466,108 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 margin:
                                                     EdgeInsets.only(bottom: 15),
                                                 child: Center(
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
+                                                  child: Stack(
                                                     children: [
-                                                      Text(
-                                                        snapshot
-                                                            .data.docs[index]
-                                                            .data()['username']
-                                                            .toString()
-                                                            .toUpperCase(),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
+                                                      Container(
+                                                        child: Center(
+                                                          child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                snapshot.data
+                                                                    .docs[index]
+                                                                    .data()[
+                                                                        'username']
+                                                                    .toString()
+                                                                    .toUpperCase(),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              snapshot
+                                                                          .data
+                                                                          .docs[
+                                                                              index]
+                                                                          .data()['role'] ==
+                                                                      1
+                                                                  ? Text(
+                                                                      snapshot
+                                                                          .data
+                                                                          .docs[
+                                                                              index]
+                                                                          .data()[
+                                                                              'email']
+                                                                          .toString(),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white),
+                                                                    )
+                                                                  : Text(
+                                                                      snapshot
+                                                                          .data
+                                                                          .docs[
+                                                                              index]
+                                                                          .data()[
+                                                                              'phone']
+                                                                          .toString()
+                                                                          .replaceAllMapped(
+                                                                              RegExp(r'(\d{3})(\d{3})(\d+)'),
+                                                                              (Match m) => "(${m[1]}) ${m[2]}-${m[3]}"),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white),
+                                                                    )
+                                                            ],
+                                                          ),
+                                                        ),
                                                       ),
                                                       snapshot.data.docs[index]
                                                                       .data()[
                                                                   'role'] ==
                                                               1
-                                                          ? Text(
-                                                              snapshot.data
-                                                                  .docs[index]
-                                                                  .data()[
-                                                                      'email']
-                                                                  .toString(),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
+                                                          ? Positioned(
+                                                              top: 5,
+                                                              right: 5,
+                                                              child: IconButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            "users")
+                                                                        .doc(snapshot
+                                                                            .data
+                                                                            .docs[index]
+                                                                            .id
+                                                                            .toString())
+                                                                        .delete();
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                            _delete);
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  icon: Icon(
+                                                                    Icons
+                                                                        .delete,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    size: 16,
+                                                                  )),
                                                             )
-                                                          : Text(
-                                                              snapshot.data
-                                                                  .docs[index]
-                                                                  .data()[
-                                                                      'phone']
-                                                                  .toString()
-                                                                  .replaceAllMapped(
-                                                                      RegExp(
-                                                                          r'(\d{3})(\d{3})(\d+)'),
-                                                                      (Match m) =>
-                                                                          "(${m[1]}) ${m[2]}-${m[3]}"),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            )
+                                                          : Container(),
                                                     ],
                                                   ),
                                                 ),
@@ -418,7 +584,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   //<DoretcumentSnapshot> items = snapshot.data;
                                   return Container(child: Text("No data"));
                                 }
-                                return Container();
                               })
                         ],
                       )),
@@ -445,3 +610,17 @@ class _LoginScreenState extends State<LoginScreen> {
     duration: Duration(seconds: 3),
   );
 }
+
+final _delete = SnackBar(
+  content: Text(
+    'Deleted Successfully',
+    textAlign: TextAlign.center,
+    style: TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: 17,
+    ),
+  ),
+  backgroundColor: Colors.green,
+  duration: Duration(seconds: 3),
+);
