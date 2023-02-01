@@ -50,73 +50,7 @@ class _AddCategoryState extends State<AddModel> {
     setState(() {
       imgLoad = true;
     });
-    // FirebaseFirestore.instance.collection("make").get().then((value) {
-    //   int i = 0;
-    //   setState(() {
-    //     makes = value.docs;
-    //   });
-    //   value.docs.forEach((element) async {
-    //     Reference storage =
-    //         FirebaseStorage.instance.ref().child(element['img']);
-    //     String url = await storage.getDownloadURL();
-    //     if (element['make'] == makes[0]['make']) {
-    //       setState(() {
-    //         selectedMake = element;
-    //       });
-    //     }
-    //     setState(() {
-    //       makes[i] = {
-    //         'make': element['make'],
-    //         'img': url,
-    //         'id': element.id
-    //       };
-    //     });
-
-    //     i++;
-    //   });
-
-    //   if (i + 1 == value.docs.length) {
-
-    //   }
-    // });
   }
-  // List<dynamic> makes = [];
-  // dynamic selectedMake;
-  // bool imgLoad = false;
-
-  // getCats() async {
-  //   FirebaseFirestore.instance.collection("make").get().then((value) {
-  //     int i = 0;
-  //     setState(() {
-  //       makes = value.docs;
-  //     });
-  //     value.docs.forEach((element) async {
-  //       Reference storage =
-  //           FirebaseStorage.instance.ref().child(element['img']);
-  //       String url = await storage.getDownloadURL();
-  //       if (element['make'] == makes[0]['make']) {
-  //         setState(() {
-  //           selectedMake = element;
-  //         });
-  //       }
-  //       setState(() {
-  //         makes[i] = {
-  //           'make': element['make'],
-  //           'img': url,
-  //           'id': element.id
-  //         };
-  //       });
-
-  //       i++;
-  //     });
-
-  //     if (i + 1 == value.docs.length) {
-  //       setState(() {
-  //         imgLoad = true;
-  //       });
-  //     }
-  //   });
-  // }
 
   void initState() {
     getCats();

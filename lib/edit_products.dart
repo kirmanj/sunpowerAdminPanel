@@ -33,7 +33,6 @@ class _EditProductState extends State<EditProduct> {
   TextEditingController itemCode = TextEditingController();
   TextEditingController barCode = TextEditingController();
   String barcodeT = "";
-  TextEditingController brand = TextEditingController();
   TextEditingController piecesInBox = TextEditingController();
   TextEditingController volt = TextEditingController();
   TextEditingController quantity = TextEditingController();
@@ -64,6 +63,10 @@ class _EditProductState extends State<EditProduct> {
   List<QueryDocumentSnapshot> modelList = [];
   String selectedModel = '';
   String modelID = '';
+
+  List<QueryDocumentSnapshot> brandList = [];
+  String selectBrand = '';
+  String brandId = '';
 
   late List<Widget> imageSliders = images
       .map((item) => Container(
@@ -108,6 +111,16 @@ class _EditProductState extends State<EditProduct> {
       .toList();
 
   getCategory() {
+    FirebaseFirestore.instance.collection('brands').get().then((value) {
+      // setState(() {
+      //   selectBrand = value.docs[0].data()['name'];
+      // });
+      value.docs.forEach((element) {
+        setState(() {
+          brandList.add(element);
+        });
+      });
+    });
     FirebaseFirestore.instance.collection('categories').get().then((value) {
       value.docs.forEach((element) {
         setState(() {
@@ -143,7 +156,7 @@ class _EditProductState extends State<EditProduct> {
     name.text = widget.Product['name'];
     barCode.text = widget.Product['barCode'].toString();
     // barcodeT = widget.Product['name'];
-    brand.text = widget.Product['brand'];
+
     nameA.text = widget.Product['nameA'];
     nameK.text = widget.Product['nameK'];
     oemCode.text = widget.Product['oemCode'].toString();
@@ -169,6 +182,7 @@ class _EditProductState extends State<EditProduct> {
         .then((value) {
       setState(() {
         selectedCategory = value.get('name');
+        selectBrand = widget.Product['brand'];
       });
     });
 
@@ -702,182 +716,176 @@ class _EditProductState extends State<EditProduct> {
                                         SizedBox(
                                           height: width * 0.0146,
                                         ),
-                                        Container(
-                                          width: width * 0.15,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              SizedBox(
-                                                height: width * 0.0146,
-                                              ),
-                                              Container(
-                                                height: height * 0.075,
-                                                width: width * 0.15,
-                                                child: BarcodeWidget(
-                                                  data: barCode.text,
-                                                  barcode: Barcode.ean13(),
-                                                  errorBuilder: (context,
-                                                          error) =>
-                                                      Center(
-                                                          child: Text(
-                                                              "ean 13 barcode should be 12 number")),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: width * 0.0146,
-                                              ),
-                                              InkWell(
-                                                child: Container(
-                                                    width: width * 0.1,
-                                                    height: height * 0.05,
-                                                    decoration: BoxDecoration(
-                                                        gradient:
-                                                            LinearGradient(
-                                                          colors: [
-                                                            Color.fromARGB(255,
-                                                                0, 178, 169),
-                                                            Color.fromARGB(255,
-                                                                0, 106, 101),
-                                                          ],
-                                                          begin: Alignment
-                                                              .centerLeft,
-                                                          end: Alignment
-                                                              .centerRight,
-                                                        ),
-                                                        borderRadius:
-                                                            const BorderRadius
-                                                                .all(
-                                                          Radius.circular(25.0),
-                                                        ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.green
-                                                                .withOpacity(
-                                                                    0.2),
-                                                            spreadRadius: 4,
-                                                            blurRadius: 10,
-                                                            offset:
-                                                                Offset(0, 0),
-                                                          )
-                                                        ]),
-                                                    child: Center(
-                                                        child: Container(
-                                                      child: Text('Done',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                          )),
-                                                    ))),
-                                                onTap: () {
-                                                  if (_formKey.currentState!
-                                                      .validate()) {
-                                                    if (categoryID.isEmpty ||
-                                                        image.isEmpty) {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              _missingData);
-                                                    } else {
-                                                      menuProducts
-                                                          .doc(widget.Product[
-                                                              "productID"])
-                                                          .update({
-                                                        "categoryID":
-                                                            categoryID,
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text('Select Brand'),
+                                            SizedBox(
+                                              width: width * 0.0146,
+                                            ),
+                                            DropdownButton<String>(
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                              value: selectBrand,
+                                              iconEnabledColor:
+                                                  Theme.of(context)
+                                                      .highlightColor,
+                                              items: brandList.map<
+                                                      DropdownMenuItem<String>>(
+                                                  (QueryDocumentSnapshot
+                                                      value) {
+                                                return DropdownMenuItem<String>(
+                                                  value:
+                                                      value['name'].toString(),
+                                                  child: Text(
+                                                    value['name'],
+                                                    style: TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              hint: Text("Choose Brand"),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  selectBrand =
+                                                      value.toString();
+                                                });
+                                              },
+                                              // onTap: () {
+                                              //   setState(() {
+                                              //     saveData(_chosenValue);
+                                              //   });
+                                              // },
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: width * 0.0146,
+                                        ),
+                                        InkWell(
+                                          child: Container(
+                                              width: width * 0.1,
+                                              height: height * 0.05,
+                                              decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      Color.fromARGB(
+                                                          255, 0, 178, 169),
+                                                      Color.fromARGB(
+                                                          255, 0, 106, 101),
+                                                    ],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight,
+                                                  ),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                    Radius.circular(25.0),
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.green
+                                                          .withOpacity(0.2),
+                                                      spreadRadius: 4,
+                                                      blurRadius: 10,
+                                                      offset: Offset(0, 0),
+                                                    )
+                                                  ]),
+                                              child: Center(
+                                                  child: Container(
+                                                child: Text('Done',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                    )),
+                                              ))),
+                                          onTap: () {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              if (categoryID.isEmpty ||
+                                                  image.isEmpty) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(_missingData);
+                                              } else {
+                                                menuProducts
+                                                    .doc(widget
+                                                        .Product["productID"])
+                                                    .update({
+                                                  "categoryID": categoryID,
 
-                                                        'makeId': makeID,
-                                                        'modelId': modelID,
-                                                        'name': name.text,
-                                                        "images": images,
-                                                        'nameK': nameK.text,
-                                                        'nameA': nameA.text,
-                                                        'desc': descE.text,
-                                                        'descK': descK.text,
-                                                        'descA': descA.text,
+                                                  'makeId': makeID,
+                                                  'modelId': modelID,
+                                                  'name': name.text,
+                                                  "images": images,
+                                                  'nameK': nameK.text,
+                                                  'nameA': nameA.text,
+                                                  'desc': descE.text,
+                                                  'descK': descK.text,
+                                                  'descA': descA.text,
 
-                                                        'oemCode': int.parse(
-                                                            oemCode.text
-                                                                .toString()),
-                                                        'itemCode': int.parse(
-                                                            itemCode.text
-                                                                .toString()),
-                                                        'barCode': int.parse(
-                                                            barCode.text
-                                                                .toString()),
-                                                        'piecesInBox': int
-                                                            .parse(piecesInBox
-                                                                .text
-                                                                .toString()),
-                                                        'brand': brand.text,
-                                                        'volt': volt.text,
-                                                        "pdfUrl":
-                                                            pdfurl.toString() ==
-                                                                    ''
-                                                                ? widget.Product[
-                                                                    'pdfUrl']
-                                                                : pdfurl
-                                                                    .toString(),
-                                                        'quantity': int.parse(
-                                                            quantity.text
-                                                                .toString()),
-                                                        'cost price': int.parse(
-                                                            cPrice.text),
-                                                        'retail price':
-                                                            int.parse(
-                                                                rPrice.text),
-                                                        'old price': int.parse(
-                                                            oPrice.text),
-                                                        'wholesale price':
-                                                            int.parse(
-                                                                wPrice.text),
-                                                        "Time": DateTime.now(),
-                                                        "img": image,
+                                                  'oemCode': int.parse(
+                                                      oemCode.text.toString()),
+                                                  'itemCode': int.parse(
+                                                      itemCode.text.toString()),
+                                                  'barCode': int.parse(
+                                                      barCode.text.toString()),
+                                                  'piecesInBox': int.parse(
+                                                      piecesInBox.text
+                                                          .toString()),
+                                                  'brand': selectBrand,
+                                                  'volt': volt.text,
+                                                  "pdfUrl": pdfurl.toString() ==
+                                                          ''
+                                                      ? widget.Product['pdfUrl']
+                                                      : pdfurl.toString(),
+                                                  'quantity': int.parse(
+                                                      quantity.text.toString()),
+                                                  'cost price':
+                                                      int.parse(cPrice.text),
+                                                  'retail price':
+                                                      int.parse(rPrice.text),
+                                                  'old price':
+                                                      int.parse(oPrice.text),
+                                                  'wholesale price':
+                                                      int.parse(wPrice.text),
+                                                  "Time": DateTime.now(),
+                                                  "img": image,
 
-                                                        // "Time": DateTime.now(),// John Doe
-                                                      });
-                                                      setState(() {
-                                                        name.text = '';
-                                                        nameK.text = '';
-                                                        nameA.text = '';
-                                                        descE.text = '';
-                                                        descK.text = '';
-                                                        descA.text = '';
-                                                        cPrice.text = '';
-                                                        wPrice.text = '';
-                                                        images = [];
-                                                        pdfLoading = false;
-                                                        rPrice.text = '';
-                                                        oPrice.text = '';
-                                                        image = '';
-                                                        brand.text = '';
-                                                        oemCode.text = '';
-                                                        itemCode.text = '';
-                                                        barCode.text = '';
-                                                        quantity.text = '';
-                                                        volt.text = '';
-                                                        piecesInBox.text = '';
+                                                  // "Time": DateTime.now(),// John Doe
+                                                });
+                                                setState(() {
+                                                  name.text = '';
+                                                  nameK.text = '';
+                                                  nameA.text = '';
+                                                  descE.text = '';
+                                                  descK.text = '';
+                                                  descA.text = '';
+                                                  cPrice.text = '';
+                                                  wPrice.text = '';
+                                                  images = [];
+                                                  pdfLoading = false;
+                                                  rPrice.text = '';
+                                                  oPrice.text = '';
+                                                  image = '';
 
-                                                        randomNumber =
-                                                            uuid.v1();
-                                                      });
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                              _success);
-                                                      Navigator.pushReplacement(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  Products()));
-                                                    }
-                                                  }
-                                                },
-                                              ),
-                                              SizedBox(
-                                                height: width * 0.0146,
-                                              ),
-                                            ],
-                                          ),
+                                                  oemCode.text = '';
+                                                  itemCode.text = '';
+                                                  barCode.text = '';
+                                                  quantity.text = '';
+                                                  volt.text = '';
+                                                  piecesInBox.text = '';
+
+                                                  randomNumber = uuid.v1();
+                                                });
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(_success);
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            Products()));
+                                              }
+                                            }
+                                          },
                                         ),
                                       ],
                                     ),
@@ -1001,16 +1009,76 @@ class _EditProductState extends State<EditProduct> {
                                                   MainAxisAlignment.spaceAround,
                                               children: [
                                                 Expanded(
-                                                  flex: 1,
+                                                  flex: 2,
                                                   child: TextFormField(
-                                                    controller: oemCode,
+                                                    controller: barCode,
+                                                    onChanged: (text) {
+                                                      setState(() {
+                                                        barcodeT = barCode.text;
+                                                      });
+                                                    },
                                                     validator: (val) {
                                                       if (val!.isEmpty) {
-                                                        return "Enter OEM Code";
+                                                        return "Enter Barcode";
+                                                      } else if (val.length !=
+                                                          12) {
+                                                        return "Barcode should be 12 numbers";
                                                       } else {
                                                         return null;
                                                       }
                                                     },
+                                                    decoration: InputDecoration(
+                                                      hintText:
+                                                          "Enter 12 numbers EAN 13",
+                                                      labelText: "Bar Code",
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6.0),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: Container(),
+                                                ),
+
+                                                Expanded(
+                                                  flex: 2,
+                                                  child: Container(
+                                                    height: height * 0.075,
+                                                    child: BarcodeWidget(
+                                                      data: barCode.text,
+                                                      barcode: Barcode.ean13(),
+                                                      errorBuilder: (context,
+                                                              error) =>
+                                                          Center(
+                                                              child: Text(
+                                                                  "ean 13 barcode should be 12 number")),
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                //description
+                                              ],
+                                            ),
+                                          ),
+
+                                          SizedBox(
+                                            height: height * 0.0229,
+                                          ),
+                                          Container(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: TextFormField(
+                                                    controller: oemCode,
                                                     decoration: InputDecoration(
                                                       hintText: 'OEM CODE',
                                                       labelText: 'OEM CODE',
@@ -1045,73 +1113,6 @@ class _EditProductState extends State<EditProduct> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(5.0),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: width * 0.01,
-                                                ),
-                                                Expanded(
-                                                  flex: 1,
-                                                  child: TextFormField(
-                                                    controller: barCode,
-                                                    onChanged: (text) {
-                                                      setState(() {
-                                                        barcodeT = barCode.text;
-                                                      });
-                                                    },
-                                                    validator: (val) {
-                                                      if (val!.isEmpty) {
-                                                        return "Enter Barcode";
-                                                      } else {
-                                                        return null;
-                                                      }
-                                                    },
-                                                    decoration: InputDecoration(
-                                                      hintText: "Bar Code",
-                                                      labelText: "Bar Code",
-                                                      border:
-                                                          OutlineInputBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(6.0),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-
-                                                //description
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: height * 0.0229,
-                                          ),
-                                          Container(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              children: [
-                                                Expanded(
-                                                  flex: 1,
-                                                  child: TextFormField(
-                                                    controller: brand,
-                                                    validator: (val) {
-                                                      if (val!.isEmpty) {
-                                                        return "Enter Brand";
-                                                      } else {
-                                                        return null;
-                                                      }
-                                                    },
-                                                    decoration: InputDecoration(
-                                                      hintText: 'Brand',
-                                                      labelText: 'Brand',
-                                                      border:
-                                                          OutlineInputBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(6.0),
                                                       ),
                                                     ),
                                                   ),

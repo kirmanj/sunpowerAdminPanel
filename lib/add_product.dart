@@ -64,7 +64,6 @@ class _AddProductState extends State<AddProduct> {
 
   List<QueryDocumentSnapshot> brandList = [];
   String selectBrand = '';
-  String brandId = '';
 
   late List<Widget> imageSliders = images
       .map((item) => Container(
@@ -109,11 +108,9 @@ class _AddProductState extends State<AddProduct> {
       .toList();
 
   getCategory() {
-    FirebaseFirestore.instance.collection('brand').get().then((value) {
+    FirebaseFirestore.instance.collection('brands').get().then((value) {
       setState(() {
         selectBrand = value.docs[0].data()['name'];
-        brandId = value.docs[0].id;
-        print(brandId);
       });
       value.docs.forEach((element) {
         setState(() {

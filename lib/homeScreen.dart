@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/add_brand.dart';
+import 'package:explore/add_brands.dart';
 import 'package:explore/add_category.dart';
 import 'package:explore/add_user.dart';
 import 'package:explore/adminControl.dart';
@@ -145,8 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 });
                               },
                               child: Container(
-                                  width: width * 0.1,
-                                  height: height * 0.1,
+                                  width: width * 0.08,
+                                  height: height * 0.08,
                                   decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
@@ -180,8 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         builder: (context) => AddCategory()));
                               },
                               child: Container(
-                                  width: width * 0.1,
-                                  height: height * 0.1,
+                                  width: width * 0.08,
+                                  height: height * 0.08,
                                   decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
@@ -254,8 +255,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 }).whenComplete(() {});
                               },
                               child: Container(
-                                  width: width * 0.1,
-                                  height: height * 0.1,
+                                  width: width * 0.08,
+                                  height: height * 0.08,
                                   decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
@@ -289,8 +290,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         builder: (context) => AddProduct()));
                               },
                               child: Container(
-                                  width: width * 0.1,
-                                  height: height * 0.1,
+                                  width: width * 0.08,
+                                  height: height * 0.08,
                                   decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
@@ -321,46 +322,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => Products()));
-                              },
-                              child: Container(
-                                  width: width * 0.1,
-                                  height: height * 0.1,
-                                  decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Color.fromARGB(255, 0, 178, 169),
-                                          Color.fromARGB(255, 0, 106, 101),
-                                        ],
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                      ),
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(10.0),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.green.withOpacity(0.2),
-                                          spreadRadius: 4,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 3),
-                                        )
-                                      ]),
-                                  child: Center(
-                                      child: Text('Products',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ))))),
-                          InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
                                         builder: (context) => LoginScreen()));
                               },
                               child: Container(
-                                  width: width * 0.1,
-                                  height: height * 0.1,
+                                  width: width * 0.08,
+                                  height: height * 0.08,
                                   decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
@@ -391,11 +357,81 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
+                                        builder: (context) => BrandsNew()));
+                              },
+                              child: Container(
+                                  width: width * 0.08,
+                                  height: height * 0.08,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Add Brand',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Products()));
+                              },
+                              child: Container(
+                                  width: width * 0.08,
+                                  height: height * 0.08,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Products',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
                                         builder: (context) => OrderHistory()));
                               },
                               child: Container(
-                                  width: width * 0.1,
-                                  height: height * 0.1,
+                                  width: width * 0.08,
+                                  height: height * 0.08,
                                   decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
@@ -429,8 +465,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         builder: (context) => AddBrand()));
                               },
                               child: Container(
-                                  width: width * 0.1,
-                                  height: height * 0.1,
+                                  width: width * 0.08,
+                                  height: height * 0.08,
                                   decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
