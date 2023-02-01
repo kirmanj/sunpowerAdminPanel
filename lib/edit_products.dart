@@ -231,8 +231,7 @@ class _EditProductState extends State<EditProduct> {
                             Padding(
                               padding: const EdgeInsets.all(20.0),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   InkWell(
                                       onTap: () {
@@ -243,6 +242,9 @@ class _EditProductState extends State<EditProduct> {
                                         color:
                                             Color.fromARGB(255, 13, 143, 136),
                                       )),
+                                  SizedBox(
+                                    width: width * 0.45,
+                                  ),
                                   Container(
                                       width: width * 0.1,
                                       height: height * 0.05,
@@ -259,30 +261,6 @@ class _EditProductState extends State<EditProduct> {
                                       child: Center(
                                           child:
                                               Text('Editing Product Panel'))),
-                                  InkWell(
-                                    onTap: () {
-                                      menuProducts
-                                          .doc(widget.Product["productID"])
-                                          .delete();
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  Products()));
-                                    },
-                                    child: Container(
-                                        width: width * 0.07,
-                                        height: height * 0.05,
-                                        decoration: BoxDecoration(
-                                            color: Colors.red[700],
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Center(
-                                            child: Text(
-                                          'Delete',
-                                          style: TextStyle(color: Colors.white),
-                                        ))),
-                                  ),
                                 ],
                               ),
                             ),
@@ -738,8 +716,12 @@ class _EditProductState extends State<EditProduct> {
                                                 width: width * 0.15,
                                                 child: BarcodeWidget(
                                                   data: barCode.text,
-                                                  barcode: Barcode.code128(
-                                                      escapes: true),
+                                                  barcode: Barcode.ean13(),
+                                                  errorBuilder: (context,
+                                                          error) =>
+                                                      Center(
+                                                          child: Text(
+                                                              "ean 13 barcode should be 12 number")),
                                                 ),
                                               ),
                                               SizedBox(

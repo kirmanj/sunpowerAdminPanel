@@ -498,12 +498,12 @@ class _AddCategoryState extends State<AddCategory> {
                                                                   )),
                                                             ),
                                                             Positioned(
-                                                                top: 0,
+                                                                bottom: 25,
                                                                 right: 0,
                                                                 child:
                                                                     Container(
                                                                   //   width: width * 0.08,
-                                                                  child: Row(
+                                                                  child: Column(
                                                                     mainAxisAlignment:
                                                                         MainAxisAlignment
                                                                             .center,
@@ -530,9 +530,54 @@ class _AddCategoryState extends State<AddCategory> {
                                                                       IconButton(
                                                                           onPressed:
                                                                               () {
-                                                                            categoryCollection.doc(categories[index]['id'].toString()).delete();
-                                                                            ScaffoldMessenger.of(context).showSnackBar(_delete);
-                                                                            Navigator.pop(context);
+                                                                            int length =
+                                                                                0;
+                                                                            FirebaseFirestore.instance.collection("products").where("categoryID", isEqualTo: categories[index]['id'].toString()).get().then((value) {
+                                                                              length = value.docs.length;
+                                                                            }).whenComplete(() {
+                                                                              showDialog(
+                                                                                context: context,
+                                                                                builder: (_) => AlertDialog(
+                                                                                  title: Text(
+                                                                                    length.toString() + ' products will be deleted too, Are You Sure?',
+                                                                                    style: TextStyle(fontSize: 14),
+                                                                                  ),
+                                                                                  // shape: CircleBorder(),
+                                                                                  shape: BeveledRectangleBorder(
+                                                                                    borderRadius: BorderRadius.circular(5.0),
+                                                                                  ),
+                                                                                  elevation: 30,
+                                                                                  backgroundColor: Colors.white,
+                                                                                  contentPadding: EdgeInsets.all(5),
+                                                                                  actions: <Widget>[
+                                                                                    InkWell(
+                                                                                        onTap: () {
+                                                                                          Navigator.of(context).pop();
+                                                                                        },
+                                                                                        child: Text(
+                                                                                          'No',
+                                                                                          style: TextStyle(fontSize: 20, color: Colors.red[900]),
+                                                                                        )),
+                                                                                    SizedBox(
+                                                                                      height: 30,
+                                                                                    ),
+                                                                                    InkWell(
+                                                                                      onTap: () {
+                                                                                        FirebaseFirestore.instance.collection("products").where("categoryID", isEqualTo: categories[index]['id'].toString()).get().then((value) {
+                                                                                          value.docs.forEach((element) {
+                                                                                            FirebaseFirestore.instance.collection("products").doc(element.id).delete();
+                                                                                          });
+                                                                                        });
+                                                                                        categoryCollection.doc(categories[index]['id'].toString()).delete();
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                                        Navigator.pop(context);
+                                                                                      },
+                                                                                      child: Text('Yes', style: TextStyle(fontSize: 20, color: Colors.green[900])),
+                                                                                    )
+                                                                                  ],
+                                                                                ),
+                                                                              );
+                                                                            });
                                                                           },
                                                                           icon:
                                                                               Icon(

@@ -542,22 +542,59 @@ class _LoginScreenState extends State<LoginScreen> {
                                                               child: IconButton(
                                                                   onPressed:
                                                                       () {
-                                                                    FirebaseFirestore
-                                                                        .instance
-                                                                        .collection(
-                                                                            "users")
-                                                                        .doc(snapshot
-                                                                            .data
-                                                                            .docs[index]
-                                                                            .id
-                                                                            .toString())
-                                                                        .delete();
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                            _delete);
-                                                                    Navigator.pop(
-                                                                        context);
+                                                                    showDialog(
+                                                                      context:
+                                                                          context,
+                                                                      builder:
+                                                                          (_) =>
+                                                                              AlertDialog(
+                                                                        title:
+                                                                            Text(
+                                                                          snapshot.data.docs[index].data()['email'].toString() +
+                                                                              '  will be deleted, Are You Sure?',
+                                                                          style:
+                                                                              TextStyle(fontSize: 14),
+                                                                        ),
+                                                                        // shape: CircleBorder(),
+                                                                        shape:
+                                                                            BeveledRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(5.0),
+                                                                        ),
+                                                                        elevation:
+                                                                            30,
+                                                                        backgroundColor:
+                                                                            Colors.white,
+                                                                        contentPadding:
+                                                                            EdgeInsets.all(5),
+                                                                        actions: <
+                                                                            Widget>[
+                                                                          InkWell(
+                                                                              onTap: () {
+                                                                                Navigator.of(context).pop();
+                                                                              },
+                                                                              child: Text(
+                                                                                'No',
+                                                                                style: TextStyle(fontSize: 20, color: Colors.red[900]),
+                                                                              )),
+                                                                          SizedBox(
+                                                                            height:
+                                                                                30,
+                                                                          ),
+                                                                          InkWell(
+                                                                            onTap:
+                                                                                () {
+                                                                              FirebaseFirestore.instance.collection("users").doc(snapshot.data.docs[index].id.toString()).delete();
+                                                                              ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                              Navigator.pop(context);
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            child:
+                                                                                Text('Yes', style: TextStyle(fontSize: 20, color: Colors.green[900])),
+                                                                          )
+                                                                        ],
+                                                                      ),
+                                                                    );
                                                                   },
                                                                   icon: Icon(
                                                                     Icons

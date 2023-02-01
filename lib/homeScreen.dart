@@ -4,10 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/add_brand.dart';
 import 'package:explore/add_category.dart';
 import 'package:explore/add_user.dart';
+import 'package:explore/adminControl.dart';
 import 'package:explore/login.dart';
 import 'package:explore/products.dart';
 import 'package:explore/web/newOrders.dart';
 import 'package:explore/web/order_history.dart';
+import 'package:explore/web/responsive.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -63,6 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        actions: [],
         backgroundColor: Color.fromARGB(255, 78, 162, 154),
         title: Container(
           width: width,
@@ -70,7 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
             minLeadingWidth: 0,
             leading: Container(
               height: height * 0.1,
-              width: width * 0.15,
+              width: ResponsiveWidget.isSmallScreen(context)
+                  ? width * 0.5
+                  : width * 0.15,
               child: Image.asset(
                 true
                     ? 'assets/images/sunpower2.png'
@@ -88,336 +93,405 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         color: Colors.white,
         width: width,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AddCategory()));
-                        },
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.1,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.2),
-                                    spreadRadius: 4,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 3),
-                                  )
-                                ]),
-                            child: Center(
-                                child: Text('Add Category',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ))))),
-                    InkWell(
-                        onTap: () {
-                          List<dynamic> categories = [];
-
-                          FirebaseFirestore.instance
-                              .collection("make")
-                              .get()
-                              .then((value) {
-                            int i = 0;
-                            // setState(() {
-                            //   categories = value.docs;
-                            // });
-                            value.docs.forEach((element) async {
-                              Reference storage = FirebaseStorage.instance
-                                  .ref()
-                                  .child(element['img']);
-                              String url = await storage.getDownloadURL();
-                              setState(() {
-                                categories.add({
-                                  'make': element['make'],
-                                  'img': url,
-                                  'id': element.id,
-                                  'makeA': element['makeA'],
-                                  'makeK': element['makeK']
+        child: ResponsiveWidget.isSmallScreen(context)
+            ? Card(
+                elevation: 5,
+                color: Colors.white,
+                child: Center(
+                    child: ListTile(
+                  title:
+                      Text("Sunpower Admin is only available on Laptop Screen"),
+                  subtitle: Icon(
+                    Icons.laptop_mac_outlined,
+                    color: Colors.black87,
+                    size: 55,
+                  ),
+                )),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          InkWell(
+                              onTap: () {
+                                List images = [];
+                                List slideImages = [];
+                                int deliveryFee = 0;
+                                int dinnar = 0;
+                                FirebaseFirestore.instance
+                                    .collection('Admin')
+                                    .doc("admindoc")
+                                    .get()
+                                    .then((value) {
+                                  images = value.get("offerImages");
+                                  deliveryFee = value.get("deliveryfee");
+                                  slideImages = value.get("sliderImages");
+                                  dinnar = value.get("dinnar");
+                                }).then((value) {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => AdminControl(
+                                              images,
+                                              slideImages,
+                                              deliveryFee,
+                                              dinnar)));
                                 });
-
-                                // categories[i] = {
-                                //   'make': element['make'],
-                                //   'img': url,
-                                //   'id': element.id
-                                // };
-                              });
-
-                              if (i == (value.docs.length - 1)) {
+                              },
+                              child: Container(
+                                  width: width * 0.1,
+                                  height: height * 0.1,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Admin Control',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            AddModel(categories)));
-                              }
-                              i++;
-                            });
+                                        builder: (context) => AddCategory()));
+                              },
+                              child: Container(
+                                  width: width * 0.1,
+                                  height: height * 0.1,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Add Category',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
+                                List<dynamic> categories = [];
 
-                            print(categories);
-                          }).whenComplete(() {});
-                        },
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.1,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.2),
-                                    spreadRadius: 4,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 3),
-                                  )
-                                ]),
+                                FirebaseFirestore.instance
+                                    .collection("make")
+                                    .get()
+                                    .then((value) {
+                                  int i = 0;
+                                  // setState(() {
+                                  //   categories = value.docs;
+                                  // });
+                                  value.docs.forEach((element) async {
+                                    Reference storage = FirebaseStorage.instance
+                                        .ref()
+                                        .child(element['img']);
+                                    String url = await storage.getDownloadURL();
+                                    setState(() {
+                                      categories.add({
+                                        'make': element['make'],
+                                        'img': url,
+                                        'id': element.id,
+                                        'makeA': element['makeA'],
+                                        'makeK': element['makeK']
+                                      });
+
+                                      // categories[i] = {
+                                      //   'make': element['make'],
+                                      //   'img': url,
+                                      //   'id': element.id
+                                      // };
+                                    });
+
+                                    if (i == (value.docs.length - 1)) {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AddModel(categories)));
+                                    }
+                                    i++;
+                                  });
+
+                                  print(categories);
+                                }).whenComplete(() {});
+                              },
+                              child: Container(
+                                  width: width * 0.1,
+                                  height: height * 0.1,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Add Model',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddProduct()));
+                              },
+                              child: Container(
+                                  width: width * 0.1,
+                                  height: height * 0.1,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Add Product',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Products()));
+                              },
+                              child: Container(
+                                  width: width * 0.1,
+                                  height: height * 0.1,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Products',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginScreen()));
+                              },
+                              child: Container(
+                                  width: width * 0.1,
+                                  height: height * 0.1,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Add User',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => OrderHistory()));
+                              },
+                              child: Container(
+                                  width: width * 0.1,
+                                  height: height * 0.1,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Order History',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddBrand()));
+                              },
+                              child: Container(
+                                  width: width * 0.1,
+                                  height: height * 0.1,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 0, 178, 169),
+                                          Color.fromARGB(255, 0, 106, 101),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.green.withOpacity(0.2),
+                                          spreadRadius: 4,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ]),
+                                  child: Center(
+                                      child: Text('Brands',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ))))),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 8,
+                    child: Container(
+                      width: width * 0.5,
+                      height: height * 0.9,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
                             child: Center(
-                                child: Text('Add Model',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ))))),
-                    InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AddProduct()));
-                        },
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.1,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.2),
-                                    spreadRadius: 4,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 3),
-                                  )
-                                ]),
-                            child: Center(
-                                child: Text('Add Product',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ))))),
-                    InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Products()));
-                        },
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.1,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.2),
-                                    spreadRadius: 4,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 3),
-                                  )
-                                ]),
-                            child: Center(
-                                child: Text('Products',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ))))),
-                    InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginScreen()));
-                        },
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.1,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.2),
-                                    spreadRadius: 4,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 3),
-                                  )
-                                ]),
-                            child: Center(
-                                child: Text('Add User',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ))))),
-                    InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => OrderHistory()));
-                        },
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.1,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.2),
-                                    spreadRadius: 4,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 3),
-                                  )
-                                ]),
-                            child: Center(
-                                child: Text('Order History',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ))))),
-                    InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AddBrand()));
-                        },
-                        child: Container(
-                            width: width * 0.1,
-                            height: height * 0.1,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 0, 178, 169),
-                                    Color.fromARGB(255, 0, 106, 101),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.2),
-                                    spreadRadius: 4,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 3),
-                                  )
-                                ]),
-                            child: Center(
-                                child: Text('Brands',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ))))),
-                  ],
-                ),
+                                child: Text(
+                              "New Orders",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 16),
+                            )),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+                              height: height * 0.8,
+                              // color: Colors.red,
+                              child: NewOrders())
+                        ],
+                      ),
+                    ),
+                  )
+                ],
               ),
-            ),
-            Expanded(
-              flex: 8,
-              child: Container(
-                width: width * 0.5,
-                height: height * 0.9,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Center(
-                          child: Text(
-                        "New Orders",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 16),
-                      )),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                        height: height * 0.8,
-                        // color: Colors.red,
-                        child: NewOrders())
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
       ),
     );
   }

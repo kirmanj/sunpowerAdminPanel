@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/edit_products.dart';
 import 'package:explore/homeScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
@@ -18,14 +19,14 @@ class _ProductsState extends State<Products> {
   List<String> images = [];
 
   List categoryList = [];
-  String categoryID = '';
+
   String image = '';
   List tempProductList = [];
   List productList = [];
   String selectedCategory = '';
 
   getCategory() {
-    FirebaseFirestore.instance.collection('categories').get().then((value) {
+    FirebaseFirestore.instance.collection('make').get().then((value) {
       // setState(() {
       //   selectedCategory = value.docs[0].id;
       // });
@@ -37,7 +38,7 @@ class _ProductsState extends State<Products> {
 
         setState(() {
           categoryList
-              .add({'name': element['name'], 'img': url, 'id': element.id});
+              .add({'name': element['make'], 'img': url, 'id': element.id});
         });
         // setState(() {
         //   categoryList.add(element);
@@ -60,9 +61,11 @@ class _ProductsState extends State<Products> {
         setState(() {
           tempProductList.add({
             'name': element['name'],
-            'categoryId': element['categoryID'],
+            'makeId': element['makeId'],
             'img': url,
-            'id': element.id
+            'itemCode': element['itemCode'],
+            'id': element.id,
+            'newArrival': element['newArrival']
           });
         });
       });
@@ -72,7 +75,7 @@ class _ProductsState extends State<Products> {
   updateList() {
     productList = [];
     tempProductList.forEach((element) {
-      if (element['categoryId'] == selectedCategory) {
+      if (element['makeId'] == selectedCategory) {
         setState(() {
           productList.add(element);
         });
@@ -224,11 +227,12 @@ class _ProductsState extends State<Products> {
                                         ),
                                       ))),
                           Padding(
+                            //   padding: EdgeInsets.all(width * 0),
                             padding: EdgeInsets.all(width * 0.0146),
                             child: Container(
                                 width: width * 0.7,
                                 height: height * 0.8,
-                                padding: EdgeInsets.all(width * 0.0146),
+                                //         padding: EdgeInsets.all(width * 0.0146),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.only(
@@ -269,16 +273,16 @@ class _ProductsState extends State<Products> {
                                                             .green
                                                             .withOpacity(0.5),
                                                         child: Container(
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  bottom: 15),
+                                                          // margin:
+                                                          //     EdgeInsets.only(
+                                                          //         bottom: 15),
                                                           child: Center(
                                                             child: Stack(
                                                               children: [
                                                                 Container(
                                                                   height:
                                                                       height *
-                                                                          0.2,
+                                                                          0.3,
                                                                   child: Center(
                                                                     child:
                                                                         Column(
@@ -298,15 +302,124 @@ class _ProductsState extends State<Products> {
                                                                                 BoxFit.cover,
                                                                           ),
                                                                         ),
-                                                                        Text(
-                                                                          tempProductList[index]['name']
-                                                                              .toString(),
-                                                                          textAlign:
-                                                                              TextAlign.center,
-                                                                          style: TextStyle(
-                                                                              fontSize: 12,
-                                                                              color: Colors.black),
-                                                                        ),
+                                                                        Row(
+                                                                          children: [
+                                                                            Expanded(
+                                                                              flex: 1,
+                                                                              child: Container(
+                                                                                width: 20,
+                                                                                height: 20,
+                                                                                child: IconButton(
+                                                                                    onPressed: () {
+                                                                                      FirebaseFirestore.instance.collection('products').doc(tempProductList[index]['id']).get().then((value) {
+                                                                                        print(value["itemCode"]);
+                                                                                        Map product = {
+                                                                                          "itemCode": value["itemCode"],
+                                                                                          "categoryID": value["categoryID"],
+                                                                                          "volt": value["volt"],
+                                                                                          "oemCode": value["oemCode"],
+                                                                                          "images": value["images"],
+                                                                                          "nameA": value["nameA"],
+                                                                                          "makeId": value["makeId"],
+                                                                                          "productID": value["productID"],
+                                                                                          "piecesInBox": value["piecesInBox"],
+                                                                                          "brand": value["brand"],
+                                                                                          "descA": value["descA"],
+                                                                                          "old price": value["old price"],
+                                                                                          "cost price": value["cost price"],
+                                                                                          "retail price": value["retail price"],
+                                                                                          "desc": value["desc"],
+                                                                                          "name": value["name"],
+                                                                                          "wholesale price": value["wholesale price"],
+                                                                                          "descK": value["descK"],
+                                                                                          "nameK": value["nameK"],
+                                                                                          "barCode": value["barCode"],
+                                                                                          "quantity": value["quantity"],
+                                                                                          "pdfUrl": value["pdfUrl"].toString(),
+                                                                                          "modelId": value["modelId"]
+                                                                                        };
+                                                                                        Navigator.push(context, MaterialPageRoute(builder: (context) => EditProduct(product)));
+                                                                                      });
+                                                                                    },
+                                                                                    icon: Icon(
+                                                                                      Icons.edit,
+                                                                                      color: Colors.black87,
+                                                                                      size: 12,
+                                                                                    )),
+                                                                              ),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 2,
+                                                                              child: Column(
+                                                                                children: [
+                                                                                  Text(
+                                                                                    tempProductList[index]['name'].toString(),
+                                                                                    overflow: TextOverflow.ellipsis,
+                                                                                    style: TextStyle(fontSize: 12, color: Colors.black),
+                                                                                  ),
+                                                                                  Text(
+                                                                                    tempProductList[index]['itemCode'].toString(),
+                                                                                    textAlign: TextAlign.center,
+                                                                                    style: TextStyle(fontSize: 12, color: Colors.black),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            Expanded(
+                                                                              flex: 1,
+                                                                              child: Container(
+                                                                                width: 20,
+                                                                                height: 20,
+                                                                                child: IconButton(
+                                                                                    onPressed: () {
+                                                                                      showDialog(
+                                                                                        context: context,
+                                                                                        builder: (_) => AlertDialog(
+                                                                                          title: Text(
+                                                                                            ' this product will be deleted, Are You Sure?',
+                                                                                            style: TextStyle(fontSize: 14),
+                                                                                          ),
+                                                                                          // shape: CircleBorder(),
+                                                                                          shape: BeveledRectangleBorder(
+                                                                                            borderRadius: BorderRadius.circular(5.0),
+                                                                                          ),
+                                                                                          elevation: 30,
+                                                                                          backgroundColor: Colors.white,
+                                                                                          contentPadding: EdgeInsets.all(5),
+                                                                                          actions: <Widget>[
+                                                                                            InkWell(
+                                                                                                onTap: () {
+                                                                                                  Navigator.of(context).pop();
+                                                                                                },
+                                                                                                child: Text(
+                                                                                                  'No',
+                                                                                                  style: TextStyle(fontSize: 20, color: Colors.red[900]),
+                                                                                                )),
+                                                                                            SizedBox(
+                                                                                              height: 30,
+                                                                                            ),
+                                                                                            InkWell(
+                                                                                              onTap: () {
+                                                                                                FirebaseFirestore.instance.collection("products").doc(tempProductList[index]['id']).delete();
+                                                                                                ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                                                Navigator.pop(context);
+                                                                                                Navigator.pop(context);
+                                                                                              },
+                                                                                              child: Text('Yes', style: TextStyle(fontSize: 20, color: Colors.green[900])),
+                                                                                            )
+                                                                                          ],
+                                                                                        ),
+                                                                                      );
+                                                                                    },
+                                                                                    icon: Icon(
+                                                                                      Icons.delete,
+                                                                                      color: Colors.black87,
+                                                                                      size: 12,
+                                                                                    )),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        )
                                                                       ],
                                                                     ),
                                                                   ),
@@ -315,47 +428,23 @@ class _ProductsState extends State<Products> {
                                                                   top: 0,
                                                                   right: 0,
                                                                   child:
-                                                                      IconButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            FirebaseFirestore.instance.collection('products').doc(tempProductList[index]['id']).get().then((value) {
-                                                                              print(value["itemCode"]);
-                                                                              Map product = {
-                                                                                "itemCode": value["itemCode"],
-                                                                                "categoryID": value["categoryID"],
-                                                                                "volt": value["volt"],
-                                                                                "oemCode": value["oemCode"],
-                                                                                "images": value["images"],
-                                                                                "nameA": value["nameA"],
-                                                                                "makeId": value["makeId"],
-                                                                                "productID": value["productID"],
-                                                                                "piecesInBox": value["piecesInBox"],
-                                                                                "brand": value["brand"],
-                                                                                "descA": value["descA"],
-                                                                                "old price": value["old price"],
-                                                                                "cost price": value["cost price"],
-                                                                                "retail price": value["retail price"],
-                                                                                "desc": value["desc"],
-                                                                                "name": value["name"],
-                                                                                "wholesale price": value["wholesale price"],
-                                                                                "descK": value["descK"],
-                                                                                "nameK": value["nameK"],
-                                                                                "barCode": value["barCode"],
-                                                                                "quantity": value["quantity"],
-                                                                                "pdfUrl": value["pdfUrl"],
-                                                                                "modelId": value["modelId"]
-                                                                              };
-                                                                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditProduct(product)));
+                                                                      Container(
+                                                                    child: Transform
+                                                                        .scale(
+                                                                      scale:
+                                                                          0.5,
+                                                                      child: CupertinoSwitch(
+                                                                          value: tempProductList[index]['newArrival'],
+                                                                          onChanged: (value) {
+                                                                            setState(() {
+                                                                              tempProductList[index]['newArrival'] = !tempProductList[index]['newArrival'];
+                                                                              FirebaseFirestore.instance.collection('products').doc(tempProductList[index]['id']).update({
+                                                                                "newArrival": tempProductList[index]['newArrival']
+                                                                              });
                                                                             });
-                                                                          },
-                                                                          icon:
-                                                                              Icon(
-                                                                            Icons.edit,
-                                                                            color:
-                                                                                Colors.black87,
-                                                                            size:
-                                                                                16,
-                                                                          )),
+                                                                          }),
+                                                                    ),
+                                                                  ),
                                                                 )
                                                               ],
                                                             ),
@@ -387,7 +476,7 @@ class _ProductsState extends State<Products> {
                                                     itemBuilder:
                                                         (context, index) {
                                                       if (productList[index]
-                                                              ["categoryId"] ==
+                                                              ["makeId"] ==
                                                           selectedCategory) {
                                                         return Padding(
                                                             padding:
@@ -429,10 +518,123 @@ class _ProductsState extends State<Products> {
                                                                                   fit: BoxFit.cover,
                                                                                 ),
                                                                               ),
-                                                                              Text(
-                                                                                productList[index]['name'].toString(),
-                                                                                textAlign: TextAlign.center,
-                                                                                style: TextStyle(fontSize: 12, color: Colors.black),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Expanded(
+                                                                                    flex: 1,
+                                                                                    child: Container(
+                                                                                      width: 20,
+                                                                                      height: 20,
+                                                                                      child: IconButton(
+                                                                                          onPressed: () {
+                                                                                            FirebaseFirestore.instance.collection('products').doc(productList[index]['id']).get().then((value) {
+                                                                                              print(value["itemCode"]);
+                                                                                              Map product = {
+                                                                                                "itemCode": value["itemCode"],
+                                                                                                "categoryID": value["categoryID"],
+                                                                                                "volt": value["volt"],
+                                                                                                "oemCode": value["oemCode"],
+                                                                                                "images": value["images"],
+                                                                                                "nameA": value["nameA"],
+                                                                                                "makeId": value["makeId"],
+                                                                                                "productID": value["productID"],
+                                                                                                "piecesInBox": value["piecesInBox"],
+                                                                                                "brand": value["brand"],
+                                                                                                "descA": value["descA"],
+                                                                                                "old price": value["old price"],
+                                                                                                "cost price": value["cost price"],
+                                                                                                "retail price": value["retail price"],
+                                                                                                "desc": value["desc"],
+                                                                                                "name": value["name"],
+                                                                                                "wholesale price": value["wholesale price"],
+                                                                                                "descK": value["descK"],
+                                                                                                "nameK": value["nameK"],
+                                                                                                "barCode": value["barCode"],
+                                                                                                "quantity": value["quantity"],
+                                                                                                "pdfUrl": value["pdfUrl"].toString(),
+                                                                                                "modelId": value["modelId"]
+                                                                                              };
+                                                                                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditProduct(product)));
+                                                                                            });
+                                                                                          },
+                                                                                          icon: Icon(
+                                                                                            Icons.edit,
+                                                                                            color: Colors.black87,
+                                                                                            size: 12,
+                                                                                          )),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Expanded(
+                                                                                    flex: 2,
+                                                                                    child: Column(
+                                                                                      children: [
+                                                                                        Text(
+                                                                                          productList[index]['name'].toString(),
+                                                                                          overflow: TextOverflow.ellipsis,
+                                                                                          style: TextStyle(fontSize: 12, color: Colors.black),
+                                                                                        ),
+                                                                                        Text(
+                                                                                          productList[index]['itemCode'].toString(),
+                                                                                          textAlign: TextAlign.center,
+                                                                                          style: TextStyle(fontSize: 12, color: Colors.black),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                  Expanded(
+                                                                                    flex: 1,
+                                                                                    child: Container(
+                                                                                      width: 20,
+                                                                                      height: 20,
+                                                                                      child: IconButton(
+                                                                                          onPressed: () {
+                                                                                            showDialog(
+                                                                                              context: context,
+                                                                                              builder: (_) => AlertDialog(
+                                                                                                title: Text(
+                                                                                                  ' this product will be deleted, Are You Sure?',
+                                                                                                  style: TextStyle(fontSize: 14),
+                                                                                                ),
+                                                                                                // shape: CircleBorder(),
+                                                                                                shape: BeveledRectangleBorder(
+                                                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                                                ),
+                                                                                                elevation: 30,
+                                                                                                backgroundColor: Colors.white,
+                                                                                                contentPadding: EdgeInsets.all(5),
+                                                                                                actions: <Widget>[
+                                                                                                  InkWell(
+                                                                                                      onTap: () {
+                                                                                                        Navigator.of(context).pop();
+                                                                                                      },
+                                                                                                      child: Text(
+                                                                                                        'No',
+                                                                                                        style: TextStyle(fontSize: 20, color: Colors.red[900]),
+                                                                                                      )),
+                                                                                                  SizedBox(
+                                                                                                    height: 30,
+                                                                                                  ),
+                                                                                                  InkWell(
+                                                                                                    onTap: () {
+                                                                                                      FirebaseFirestore.instance.collection("products").doc(productList[index]['id']).delete();
+                                                                                                      ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                                                      Navigator.pop(context);
+                                                                                                      Navigator.pop(context);
+                                                                                                    },
+                                                                                                    child: Text('Yes', style: TextStyle(fontSize: 20, color: Colors.green[900])),
+                                                                                                  )
+                                                                                                ],
+                                                                                              ),
+                                                                                            );
+                                                                                          },
+                                                                                          icon: Icon(
+                                                                                            Icons.delete,
+                                                                                            color: Colors.black87,
+                                                                                            size: 12,
+                                                                                          )),
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
                                                                               ),
                                                                             ],
                                                                           ),
@@ -442,13 +644,24 @@ class _ProductsState extends State<Products> {
                                                                         top: 0,
                                                                         right:
                                                                             0,
-                                                                        child: IconButton(
-                                                                            onPressed: () {},
-                                                                            icon: Icon(
-                                                                              Icons.edit,
-                                                                              color: Colors.black87,
-                                                                              size: 16,
-                                                                            )),
+                                                                        child:
+                                                                            Container(
+                                                                          child:
+                                                                              Transform.scale(
+                                                                            scale:
+                                                                                0.5,
+                                                                            child: CupertinoSwitch(
+                                                                                value: productList[index]['newArrival'],
+                                                                                onChanged: (value) {
+                                                                                  setState(() {
+                                                                                    productList[index]['newArrival'] = !productList[index]['newArrival'];
+                                                                                    FirebaseFirestore.instance.collection('products').doc(productList[index]['id']).update({
+                                                                                      "newArrival": productList[index]['newArrival']
+                                                                                    });
+                                                                                  });
+                                                                                }),
+                                                                          ),
+                                                                        ),
                                                                       )
                                                                     ],
                                                                   ),
@@ -479,3 +692,17 @@ class _ProductsState extends State<Products> {
     ));
   }
 }
+
+final _delete = SnackBar(
+  content: Text(
+    'Deleted Successfully',
+    textAlign: TextAlign.center,
+    style: TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: 17,
+    ),
+  ),
+  backgroundColor: Colors.green,
+  duration: Duration(seconds: 3),
+);

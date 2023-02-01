@@ -62,6 +62,10 @@ class _AddProductState extends State<AddProduct> {
   String selectedModel = '';
   String modelID = '';
 
+  List<QueryDocumentSnapshot> brandList = [];
+  String selectBrand = '';
+  String brandId = '';
+
   late List<Widget> imageSliders = images
       .map((item) => Container(
             child: Container(
@@ -105,6 +109,19 @@ class _AddProductState extends State<AddProduct> {
       .toList();
 
   getCategory() {
+    FirebaseFirestore.instance.collection('brand').get().then((value) {
+      setState(() {
+        selectBrand = value.docs[0].data()['name'];
+        brandId = value.docs[0].id;
+        print(brandId);
+      });
+      value.docs.forEach((element) {
+        setState(() {
+          brandList.add(element);
+        });
+      });
+    });
+
     FirebaseFirestore.instance.collection('categories').get().then((value) {
       setState(() {
         selectedCategory = value.docs[0].data()['name'];
@@ -640,24 +657,54 @@ class _AddProductState extends State<AddProduct> {
                                   SizedBox(
                                     height: width * 0.0146,
                                   ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text('Select Brand'),
+                                      SizedBox(
+                                        width: width * 0.0146,
+                                      ),
+                                      DropdownButton<String>(
+                                        style: TextStyle(color: Colors.black),
+                                        value: selectBrand,
+                                        iconEnabledColor:
+                                            Theme.of(context).highlightColor,
+                                        items: brandList
+                                            .map<DropdownMenuItem<String>>(
+                                                (QueryDocumentSnapshot value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value['name'].toString(),
+                                            child: Text(
+                                              value['name'],
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        hint: Text("Choose Brand"),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectBrand = value.toString();
+                                          });
+                                        },
+                                        // onTap: () {
+                                        //   setState(() {
+                                        //     saveData(_chosenValue);
+                                        //   });
+                                        // },
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: width * 0.0146,
+                                  ),
                                   Container(
                                     width: width * 0.15,
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
                                       children: [
-                                        SizedBox(
-                                          height: width * 0.0146,
-                                        ),
-                                        Container(
-                                          height: height * 0.075,
-                                          width: width * 0.15,
-                                          child: BarcodeWidget(
-                                            data: barCode.text,
-                                            barcode:
-                                                Barcode.code128(escapes: true),
-                                          ),
-                                        ),
                                         SizedBox(
                                           height: width * 0.0146,
                                         ),
@@ -710,6 +757,7 @@ class _AddProductState extends State<AddProduct> {
                                                   "categoryID": categoryID,
                                                   'productID':
                                                       randomNumber.toString(),
+                                                  "newArrival": false,
                                                   'makeId': makeID,
                                                   'modelId': modelID,
                                                   'name': name.text,
@@ -720,8 +768,11 @@ class _AddProductState extends State<AddProduct> {
                                                   'descK': descK.text,
                                                   'descA': descA.text,
 
-                                                  'oemCode': int.parse(
-                                                      oemCode.text.toString()),
+                                                  'oemCode': oemCode
+                                                          .text.isEmpty
+                                                      ? 0
+                                                      : int.parse(oemCode.text
+                                                          .toString()),
                                                   'itemCode': int.parse(
                                                       itemCode.text.toString()),
                                                   'barCode': int.parse(
@@ -729,7 +780,7 @@ class _AddProductState extends State<AddProduct> {
                                                   'piecesInBox': int.parse(
                                                       piecesInBox.text
                                                           .toString()),
-                                                  'brand': brand.text,
+                                                  'brand': selectBrand,
                                                   'volt': volt.text,
                                                   "pdfUrl": pdfurl.toString(),
                                                   'quantity': int.parse(
@@ -902,16 +953,73 @@ class _AddProductState extends State<AddProduct> {
                                             MainAxisAlignment.spaceAround,
                                         children: [
                                           Expanded(
-                                            flex: 1,
+                                            flex: 2,
                                             child: TextFormField(
-                                              controller: oemCode,
+                                              controller: barCode,
+                                              onChanged: (text) {
+                                                setState(() {
+                                                  barcodeT = barCode.text;
+                                                });
+                                              },
                                               validator: (val) {
                                                 if (val!.isEmpty) {
-                                                  return "Enter OEM Code";
+                                                  return "Enter Barcode";
+                                                } else if (val.length != 12) {
+                                                  return "Barcode should be 12 numbers";
                                                 } else {
                                                   return null;
                                                 }
                                               },
+                                              decoration: InputDecoration(
+                                                hintText:
+                                                    "Enter 12 numbers EAN 13",
+                                                labelText: "Bar Code",
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          6.0),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                          Expanded(
+                                            flex: 1,
+                                            child: Container(),
+                                          ),
+
+                                          Expanded(
+                                            flex: 2,
+                                            child: Container(
+                                              height: height * 0.075,
+                                              child: BarcodeWidget(
+                                                data: barCode.text,
+                                                barcode: Barcode.ean13(),
+                                                errorBuilder:
+                                                    (context, error) => Center(
+                                                        child: Text(
+                                                            "ean 13 barcode should be 12 number")),
+                                              ),
+                                            ),
+                                          ),
+
+                                          //description
+                                        ],
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                      height: height * 0.0229,
+                                    ),
+                                    Container(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextFormField(
+                                              controller: oemCode,
                                               decoration: InputDecoration(
                                                 hintText: 'OEM CODE',
                                                 labelText: 'OEM CODE',
@@ -944,71 +1052,6 @@ class _AddProductState extends State<AddProduct> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           5.0),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: width * 0.01,
-                                          ),
-                                          Expanded(
-                                            flex: 1,
-                                            child: TextFormField(
-                                              controller: barCode,
-                                              onChanged: (text) {
-                                                setState(() {
-                                                  barcodeT = barCode.text;
-                                                });
-                                              },
-                                              validator: (val) {
-                                                if (val!.isEmpty) {
-                                                  return "Enter Barcode";
-                                                } else {
-                                                  return null;
-                                                }
-                                              },
-                                              decoration: InputDecoration(
-                                                hintText: "Bar Code",
-                                                labelText: "Bar Code",
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          6.0),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-
-                                          //description
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: height * 0.0229,
-                                    ),
-                                    Container(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: TextFormField(
-                                              controller: brand,
-                                              validator: (val) {
-                                                if (val!.isEmpty) {
-                                                  return "Enter Brand";
-                                                } else {
-                                                  return null;
-                                                }
-                                              },
-                                              decoration: InputDecoration(
-                                                hintText: 'Brand',
-                                                labelText: 'Brand',
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          6.0),
                                                 ),
                                               ),
                                             ),
@@ -1339,7 +1382,7 @@ class _AddProductState extends State<AddProduct> {
       Future.delayed(Duration(milliseconds: 100), () {
         setState(() {
           pdfurl = imageUri.toString();
-          print(pdfurl);
+
           // pdfLoading = false;
         });
       });

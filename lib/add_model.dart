@@ -10,11 +10,11 @@ import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import 'package:uuid/uuid.dart';
 
 class AddModel extends StatefulWidget {
-  List<dynamic> categories = [];
-  AddModel(this.categories) : super();
+  List<dynamic> makes = [];
+  AddModel(this.makes) : super();
 
   @override
-  _AddCategoryState createState() => _AddCategoryState(this.categories);
+  _AddCategoryState createState() => _AddCategoryState(this.makes);
 }
 
 final _formKey = GlobalKey<FormState>();
@@ -29,23 +29,23 @@ class _AddCategoryState extends State<AddModel> {
   TextEditingController mnameK = TextEditingController();
   TextEditingController mnameA = TextEditingController();
   late String randomNumber;
-  final categoryCollection = FirebaseFirestore.instance.collection('make');
+  final makeCollection = FirebaseFirestore.instance.collection('make');
 
   var uuid = Uuid();
 
-  List<dynamic> categories = [];
-  dynamic selectedCategory;
+  List<dynamic> makes = [];
+  dynamic selectedMake;
   bool imgLoad = false;
   String selectedModelId = '';
 
-  _AddCategoryState(this.categories);
+  _AddCategoryState(this.makes);
 
   bool makeEdit = false;
   bool modelEdit = false;
 
   getCats() async {
     setState(() {
-      selectedCategory = categories[0];
+      selectedMake = makes[0];
     });
     setState(() {
       imgLoad = true;
@@ -53,19 +53,19 @@ class _AddCategoryState extends State<AddModel> {
     // FirebaseFirestore.instance.collection("make").get().then((value) {
     //   int i = 0;
     //   setState(() {
-    //     categories = value.docs;
+    //     makes = value.docs;
     //   });
     //   value.docs.forEach((element) async {
     //     Reference storage =
     //         FirebaseStorage.instance.ref().child(element['img']);
     //     String url = await storage.getDownloadURL();
-    //     if (element['make'] == categories[0]['make']) {
+    //     if (element['make'] == makes[0]['make']) {
     //       setState(() {
-    //         selectedCategory = element;
+    //         selectedMake = element;
     //       });
     //     }
     //     setState(() {
-    //       categories[i] = {
+    //       makes[i] = {
     //         'make': element['make'],
     //         'img': url,
     //         'id': element.id
@@ -80,27 +80,27 @@ class _AddCategoryState extends State<AddModel> {
     //   }
     // });
   }
-  // List<dynamic> categories = [];
-  // dynamic selectedCategory;
+  // List<dynamic> makes = [];
+  // dynamic selectedMake;
   // bool imgLoad = false;
 
   // getCats() async {
   //   FirebaseFirestore.instance.collection("make").get().then((value) {
   //     int i = 0;
   //     setState(() {
-  //       categories = value.docs;
+  //       makes = value.docs;
   //     });
   //     value.docs.forEach((element) async {
   //       Reference storage =
   //           FirebaseStorage.instance.ref().child(element['img']);
   //       String url = await storage.getDownloadURL();
-  //       if (element['make'] == categories[0]['make']) {
+  //       if (element['make'] == makes[0]['make']) {
   //         setState(() {
-  //           selectedCategory = element;
+  //           selectedMake = element;
   //         });
   //       }
   //       setState(() {
-  //         categories[i] = {
+  //         makes[i] = {
   //           'make': element['make'],
   //           'img': url,
   //           'id': element.id
@@ -351,8 +351,8 @@ class _AddCategoryState extends State<AddModel> {
                                                         child: InkWell(
                                                             onTap: () {
                                                               if (makeEdit) {
-                                                                categoryCollection
-                                                                    .doc(selectedCategory[
+                                                                makeCollection
+                                                                    .doc(selectedMake[
                                                                         'id'])
                                                                     .update({
                                                                   'make':
@@ -382,7 +382,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                       .showSnackBar(
                                                                           _missingData);
                                                                 } else {
-                                                                  categoryCollection
+                                                                  makeCollection
                                                                       .doc(
                                                                           randomNumber)
                                                                       .set({
@@ -392,7 +392,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                         .text,
                                                                     'makeA': nameA
                                                                         .text,
-                                                                    'categoryID':
+                                                                    'makeId':
                                                                         randomNumber
                                                                             .toString(),
                                                                     "Time":
@@ -508,7 +508,7 @@ class _AddCategoryState extends State<AddModel> {
                                             Center(
                                               child: Container(
                                                   height: height * 0.4,
-                                                  child: categories.isEmpty
+                                                  child: makes.isEmpty
                                                       ? Center(
                                                           child: Container(
                                                             child: Text(
@@ -521,8 +521,7 @@ class _AddCategoryState extends State<AddModel> {
                                                             scrollDirection:
                                                                 Axis.vertical,
                                                             itemCount:
-                                                                categories
-                                                                    .length,
+                                                                makes.length,
                                                             itemBuilder:
                                                                 (context,
                                                                     index) {
@@ -534,7 +533,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                             15.0,
                                                                         right:
                                                                             15),
-                                                                child: selectedCategory ==
+                                                                child: selectedMake ==
                                                                         null
                                                                     ? Container()
                                                                     : Container(
@@ -549,7 +548,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                               bottomRight: Radius.circular(10)),
                                                                           boxShadow: [
                                                                             BoxShadow(
-                                                                              color: selectedCategory['make'] == categories[index]['make'] ? Colors.green : Colors.grey.withOpacity(0.5),
+                                                                              color: selectedMake['make'] == makes[index]['make'] ? Colors.green : Colors.grey.withOpacity(0.5),
                                                                               spreadRadius: 1,
                                                                               blurRadius: 2,
                                                                               offset: Offset(0, 0), // changes position of shadow
@@ -561,13 +560,13 @@ class _AddCategoryState extends State<AddModel> {
                                                                                 15),
                                                                         child: ListTile(
                                                                             subtitle: Text(
-                                                                              categories[index]['make'],
+                                                                              makes[index]['make'],
                                                                               textAlign: TextAlign.center,
                                                                             ),
                                                                             title: InkWell(
                                                                               onTap: () {
                                                                                 setState(() {
-                                                                                  selectedCategory = categories[index];
+                                                                                  selectedMake = makes[index];
                                                                                 });
                                                                               },
                                                                               child: Container(
@@ -578,7 +577,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                                     Container(
                                                                                       width: width * 0.1,
                                                                                       height: height * 0.1,
-                                                                                      child: Image.network(categories[index]['img'].toString()),
+                                                                                      child: Image.network(makes[index]['img'].toString()),
                                                                                     ),
                                                                                     Positioned(
                                                                                         bottom: 0,
@@ -592,12 +591,12 @@ class _AddCategoryState extends State<AddModel> {
                                                                                                     setState(() {
                                                                                                       makeEdit = true;
 
-                                                                                                      selectedCategory = categories[index];
+                                                                                                      selectedMake = makes[index];
 
-                                                                                                      name.text = categories[index]['make'].toString();
-                                                                                                      nameA.text = categories[index]['makeA'].toString();
-                                                                                                      nameK.text = categories[index]['makeK'].toString();
-                                                                                                      img = categories[index]['img'].toString();
+                                                                                                      name.text = makes[index]['make'].toString();
+                                                                                                      nameA.text = makes[index]['makeA'].toString();
+                                                                                                      nameK.text = makes[index]['makeK'].toString();
+                                                                                                      img = makes[index]['img'].toString();
                                                                                                     });
                                                                                                   },
                                                                                                   icon: Icon(
@@ -606,11 +605,54 @@ class _AddCategoryState extends State<AddModel> {
                                                                                                   )),
                                                                                               IconButton(
                                                                                                   onPressed: () {
-                                                                                                    print(selectedCategory['id']);
-                                                                                                    print(selectedModelId);
-                                                                                                    categoryCollection.doc(selectedCategory['id']).delete();
-                                                                                                    ScaffoldMessenger.of(context).showSnackBar(_delete);
-                                                                                                    Navigator.pop(context);
+                                                                                                    int length = 0;
+                                                                                                    FirebaseFirestore.instance.collection("products").where("makeId", isEqualTo: makes[index]['id'].toString()).get().then((value) {
+                                                                                                      length = value.docs.length;
+                                                                                                    }).whenComplete(() {
+                                                                                                      showDialog(
+                                                                                                        context: context,
+                                                                                                        builder: (_) => AlertDialog(
+                                                                                                          title: Text(
+                                                                                                            length.toString() + ' products will be deleted too, Are You Sure?',
+                                                                                                            style: TextStyle(fontSize: 14),
+                                                                                                          ),
+                                                                                                          // shape: CircleBorder(),
+                                                                                                          shape: BeveledRectangleBorder(
+                                                                                                            borderRadius: BorderRadius.circular(5.0),
+                                                                                                          ),
+                                                                                                          elevation: 30,
+                                                                                                          backgroundColor: Colors.white,
+                                                                                                          contentPadding: EdgeInsets.all(5),
+                                                                                                          actions: <Widget>[
+                                                                                                            InkWell(
+                                                                                                                onTap: () {
+                                                                                                                  Navigator.of(context).pop();
+                                                                                                                },
+                                                                                                                child: Text(
+                                                                                                                  'No',
+                                                                                                                  style: TextStyle(fontSize: 20, color: Colors.red[900]),
+                                                                                                                )),
+                                                                                                            SizedBox(
+                                                                                                              height: 30,
+                                                                                                            ),
+                                                                                                            InkWell(
+                                                                                                              onTap: () {
+                                                                                                                FirebaseFirestore.instance.collection("products").where("makeId", isEqualTo: makes[index]['id'].toString()).get().then((value) {
+                                                                                                                  value.docs.forEach((element) {
+                                                                                                                    FirebaseFirestore.instance.collection("products").doc(element.id).delete();
+                                                                                                                  });
+                                                                                                                });
+                                                                                                                makeCollection.doc(makes[index]['id']).delete();
+                                                                                                                ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                                                                Navigator.pop(context);
+                                                                                                                Navigator.pop(context);
+                                                                                                              },
+                                                                                                              child: Text('Yes', style: TextStyle(fontSize: 20, color: Colors.green[900])),
+                                                                                                            )
+                                                                                                          ],
+                                                                                                        ),
+                                                                                                      );
+                                                                                                    });
                                                                                                   },
                                                                                                   icon: Icon(
                                                                                                     Icons.delete,
@@ -822,7 +864,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                           FirebaseFirestore
                                                                               .instance
                                                                               .collection('make')
-                                                                              .doc(selectedCategory['id'])
+                                                                              .doc(selectedMake['id'])
                                                                               .collection('models')
                                                                               .doc(selectedModelId)
                                                                               .update({
@@ -847,7 +889,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                           FirebaseFirestore
                                                                               .instance
                                                                               .collection('make')
-                                                                              .doc(selectedCategory['id'])
+                                                                              .doc(selectedMake['id'])
                                                                               .collection('models')
                                                                               .doc()
                                                                               .set({
@@ -940,7 +982,7 @@ class _AddCategoryState extends State<AddModel> {
                                               ),
                                             ),
                                             Center(
-                                                child: selectedCategory == null
+                                                child: selectedMake == null
                                                     ? Container()
                                                     : Container(
                                                         height: height * 0.4,
@@ -950,7 +992,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                 .collection(
                                                                     'make')
                                                                 .doc(
-                                                                    selectedCategory[
+                                                                    selectedMake[
                                                                         'id'])
                                                                 .collection(
                                                                     "models")
@@ -1048,11 +1090,54 @@ class _AddCategoryState extends State<AddModel> {
                                                                                         )),
                                                                                     IconButton(
                                                                                         onPressed: () {
-                                                                                          print(selectedCategory['id']);
-                                                                                          print(selectedModelId);
-                                                                                          categoryCollection.doc(selectedCategory['id']).collection("models").doc(snapshot.data.docs[index].id).delete();
-                                                                                          ScaffoldMessenger.of(context).showSnackBar(_delete);
-                                                                                          Navigator.pop(context);
+                                                                                          int length = 0;
+                                                                                          FirebaseFirestore.instance.collection("products").where("modelId", isEqualTo: snapshot.data.docs[index].id).get().then((value) {
+                                                                                            length = value.docs.length;
+                                                                                          }).whenComplete(() {
+                                                                                            showDialog(
+                                                                                              context: context,
+                                                                                              builder: (_) => AlertDialog(
+                                                                                                title: Text(
+                                                                                                  length.toString() + ' products will be deleted too, Are You Sure?',
+                                                                                                  style: TextStyle(fontSize: 14),
+                                                                                                ),
+                                                                                                // shape: CircleBorder(),
+                                                                                                shape: BeveledRectangleBorder(
+                                                                                                  borderRadius: BorderRadius.circular(5.0),
+                                                                                                ),
+                                                                                                elevation: 30,
+                                                                                                backgroundColor: Colors.white,
+                                                                                                contentPadding: EdgeInsets.all(5),
+                                                                                                actions: <Widget>[
+                                                                                                  InkWell(
+                                                                                                      onTap: () {
+                                                                                                        Navigator.of(context).pop();
+                                                                                                      },
+                                                                                                      child: Text(
+                                                                                                        'No',
+                                                                                                        style: TextStyle(fontSize: 20, color: Colors.red[900]),
+                                                                                                      )),
+                                                                                                  SizedBox(
+                                                                                                    height: 30,
+                                                                                                  ),
+                                                                                                  InkWell(
+                                                                                                    onTap: () {
+                                                                                                      FirebaseFirestore.instance.collection("products").where("modelId", isEqualTo: snapshot.data.docs[index].id).get().then((value) {
+                                                                                                        value.docs.forEach((element) {
+                                                                                                          FirebaseFirestore.instance.collection("products").doc(element.id).delete();
+                                                                                                        });
+                                                                                                      });
+                                                                                                      makeCollection.doc(selectedMake['id']).collection("models").doc(snapshot.data.docs[index].id).delete();
+                                                                                                      ScaffoldMessenger.of(context).showSnackBar(_delete);
+                                                                                                      Navigator.pop(context);
+                                                                                                      Navigator.pop(context);
+                                                                                                    },
+                                                                                                    child: Text('Yes', style: TextStyle(fontSize: 20, color: Colors.green[900])),
+                                                                                                  )
+                                                                                                ],
+                                                                                              ),
+                                                                                            );
+                                                                                          });
                                                                                         },
                                                                                         icon: Icon(
                                                                                           Icons.delete,
@@ -1128,7 +1213,7 @@ class _AddCategoryState extends State<AddModel> {
     selectImage(onSelected: (file) async {
       fb.StorageReference storageRef = fb
           .storage()
-          .refFromURL('gs://resturant-management-f42e5.appspot.com')
+          .refFromURL('gs://baharka-library-e410f.appspot.com/')
           .child(path);
       var uploadTaskSnapshot = await storageRef.put(file).future;
       Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
