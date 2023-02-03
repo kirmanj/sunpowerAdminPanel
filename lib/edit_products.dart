@@ -806,6 +806,7 @@ class _EditProductState extends State<EditProduct> {
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(_missingData);
                                               } else {
+                                                print("pdfurl" + pdfurl);
                                                 menuProducts
                                                     .doc(widget
                                                         .Product["productID"])
@@ -833,8 +834,7 @@ class _EditProductState extends State<EditProduct> {
                                                           .toString()),
                                                   'brand': selectBrand,
                                                   'volt': volt.text,
-                                                  "pdfUrl": pdfurl.toString() ==
-                                                          ''
+                                                  "pdfUrl": pdfurl.isEmpty
                                                       ? widget.Product['pdfUrl']
                                                       : pdfurl.toString(),
                                                   'quantity': int.parse(
@@ -1458,7 +1458,8 @@ class _EditProductState extends State<EditProduct> {
       Future.delayed(Duration(milliseconds: 100), () {
         setState(() {
           pdfurl = imageUri.toString();
-          print(pdfurl);
+          print(imageUri);
+          print("pdfurl" + pdfurl);
           // pdfLoading = false;
         });
       });

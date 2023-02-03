@@ -288,7 +288,7 @@ class _AddCategoryState extends State<AddCategory> {
                                               'name': name.text,
                                               'nameK': nameK.text,
                                               'nameA': nameA.text,
-
+                                              'img': img
                                               // "Time": DateTime.now(),// John Doe
                                             });
                                             Navigator.pop(context);
@@ -635,6 +635,9 @@ class _AddCategoryState extends State<AddCategory> {
 
   String img = '';
   void uploadImgToStorage() {
+    setState(() {
+      img = '';
+    });
     final dateTime = DateTime.now();
     final name = 'ProductImg';
     final path = '$name/$dateTime';
@@ -650,7 +653,9 @@ class _AddCategoryState extends State<AddCategory> {
         setState(() {
           image = imageUri.toString();
           loading = false;
+          print(img);
           img = image.toString();
+          print(img);
         });
       });
     });

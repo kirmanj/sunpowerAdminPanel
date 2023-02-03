@@ -295,7 +295,7 @@ class _AddCategoryState extends State<AddModel> {
                                                                       .text,
                                                                   'makeA': nameA
                                                                       .text,
-
+                                                                  'img': img,
                                                                   "Time":
                                                                       DateTime
                                                                           .now(),
@@ -1141,6 +1141,9 @@ class _AddCategoryState extends State<AddModel> {
 
   String img = '';
   void uploadImgToStorage() {
+    setState(() {
+      img = '';
+    });
     final dateTime = DateTime.now();
     final name = 'ProductImg';
     final path = '$name/$dateTime';

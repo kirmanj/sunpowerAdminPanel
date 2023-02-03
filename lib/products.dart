@@ -18,19 +18,29 @@ class Products extends StatefulWidget {
 class _ProductsState extends State<Products> {
   List<String> images = [];
 
+  List makeList = [];
   List categoryList = [];
 
   String image = '';
   List tempProductList = [];
   List productList = [];
   String selectedCategory = '';
+  String selectedMake = '';
 
   getCategory() {
     FirebaseFirestore.instance.collection('make').get().then((value) {
-      // setState(() {
-      //   selectedCategory = value.docs[0].id;
-      // });
-      int i = 0;
+      value.docs.forEach((element) async {
+        Reference storage =
+            FirebaseStorage.instance.ref().child(element['img']);
+        String url = await storage.getDownloadURL();
+
+        setState(() {
+          makeList.add({'name': element['make'], 'img': url, 'id': element.id});
+        });
+      });
+    });
+
+    FirebaseFirestore.instance.collection('categories').get().then((value) {
       value.docs.forEach((element) async {
         Reference storage =
             FirebaseStorage.instance.ref().child(element['img']);
@@ -38,21 +48,13 @@ class _ProductsState extends State<Products> {
 
         setState(() {
           categoryList
-              .add({'name': element['make'], 'img': url, 'id': element.id});
+              .add({'name': element['name'], 'img': url, 'id': element.id});
         });
-        // setState(() {
-        //   categoryList.add(element);
-        // });
-        i++;
       });
-      // if (i == value.docs.length - 1) {
-      //   setState(() {
-      //     selectedCategory = categoryList[0]['id'];
-      //   });
-      // }
     });
 
     FirebaseFirestore.instance.collection('products').get().then((value) {
+      int i = 0;
       value.docs.forEach((element) async {
         Reference storage =
             FirebaseStorage.instance.ref().child(element['images'][0]);
@@ -65,17 +67,30 @@ class _ProductsState extends State<Products> {
             'img': url,
             'itemCode': element['itemCode'],
             'id': element.id,
-            'newArrival': element['newArrival']
+            'newArrival': element['newArrival'],
+            "categoryID": element['categoryID']
           });
         });
       });
     });
   }
 
+  bool category = false;
+  bool make = false;
+
   updateList() {
     productList = [];
     tempProductList.forEach((element) {
-      if (element['makeId'] == selectedCategory) {
+      if (element['categoryID'] == selectedCategory && category && !make) {
+        setState(() {
+          productList.add(element);
+        });
+      } else if (element['makeId'] == selectedMake && make && !category) {
+        setState(() {
+          productList.add(element);
+        });
+      } else if (element['categoryID'] == selectedCategory &&
+          element['makeId'] == selectedMake) {
         setState(() {
           productList.add(element);
         });
@@ -144,88 +159,287 @@ class _ProductsState extends State<Products> {
                       Row(
                         children: [
                           Container(
-                              width: width * 0.23,
-                              height: height * 0.8,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10),
-                                    bottomLeft: Radius.circular(10),
-                                    bottomRight: Radius.circular(10)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: Offset(
-                                        0, 3), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: categoryList.isEmpty
-                                  ? Container()
-                                  : Container(
-                                      height: height * 0.6,
-                                      child: GridView.builder(
-                                        scrollDirection: Axis.vertical,
-                                        itemCount: categoryList.length,
-                                        itemBuilder: (context, index) {
-                                          return Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 15,
-                                                  left: 15.0,
-                                                  right: 15),
-                                              child: InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selectedCategory =
-                                                        categoryList[index]
-                                                            ['id'];
-                                                  });
-                                                  updateList();
-                                                },
-                                                child: Card(
-                                                  elevation: 5,
-                                                  shadowColor:
-                                                      selectedCategory ==
-                                                              categoryList[
-                                                                  index]['id']
-                                                          ? Colors.red
-                                                          : Colors.black,
-                                                  color: Colors.white,
-                                                  child: Container(
-                                                    height: height * 0.1,
-                                                    child: Column(
-                                                      children: [
-                                                        Container(
-                                                          width: width * 0.05,
-                                                          height: height * 0.08,
-                                                          child: Image.network(
-                                                            categoryList[index]
-                                                                ['img'],
-                                                            fit: BoxFit.cover,
+                            width: width * 0.23,
+                            height: height * 0.8,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                    width: width * 0.23,
+                                    height: height * 0.38,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10),
+                                          bottomLeft: Radius.circular(10),
+                                          bottomRight: Radius.circular(10)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 5,
+                                          blurRadius: 7,
+                                          offset: Offset(0,
+                                              3), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: categoryList.isEmpty
+                                        ? Container()
+                                        : Container(
+                                            child: Column(
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: Container(
+                                                  child: Text("Category"),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 9,
+                                                child: GridView.builder(
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  itemCount:
+                                                      categoryList.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 5,
+                                                                left: 5.0,
+                                                                right: 5),
+                                                        child: InkWell(
+                                                          onTap: () {
+                                                            if (selectedCategory ==
+                                                                categoryList[
+                                                                        index]
+                                                                    ['id']) {
+                                                              setState(() {
+                                                                category =
+                                                                    false;
+                                                                selectedCategory =
+                                                                    "";
+                                                              });
+                                                            } else {
+                                                              setState(() {
+                                                                category = true;
+                                                              });
+                                                              selectedCategory =
+                                                                  categoryList[
+                                                                          index]
+                                                                      ['id'];
+                                                            }
+
+                                                            updateList();
+                                                          },
+                                                          child: Card(
+                                                            elevation: 5,
+                                                            shadowColor: selectedCategory ==
+                                                                    categoryList[
+                                                                            index]
+                                                                        ['id']
+                                                                ? Colors.red
+                                                                : Colors.black,
+                                                            color: Colors.white,
+                                                            child: Container(
+                                                              height:
+                                                                  height * 0.1,
+                                                              child: Column(
+                                                                children: [
+                                                                  Expanded(
+                                                                    flex: 3,
+                                                                    child:
+                                                                        Container(
+                                                                      child: Image
+                                                                          .network(
+                                                                        categoryList[index]
+                                                                            [
+                                                                            'img'],
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 2,
+                                                                    child: Text(
+                                                                      categoryList[
+                                                                              index]
+                                                                          [
+                                                                          'name'],
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              12),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 1,
+                                                                    child: Text(
+                                                                      "",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              12),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ),
-                                                        ),
-                                                        Text(
-                                                          categoryList[index]
-                                                              ['name'],
-                                                          style: TextStyle(
-                                                              fontSize: 12),
-                                                        ),
-                                                      ],
-                                                    ),
+                                                        ));
+                                                  },
+                                                  gridDelegate:
+                                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                                    crossAxisCount:
+                                                        width > width * 0.3
+                                                            ? 3
+                                                            : 1,
+                                                    childAspectRatio: 2,
                                                   ),
                                                 ),
-                                              ));
-                                        },
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount:
-                                              width > width * 0.3 ? 2 : 1,
-                                          childAspectRatio: 1.5,
+                                              ),
+                                            ],
+                                          ))),
+                                Container(
+                                    width: width * 0.23,
+                                    height: height * 0.38,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10),
+                                          bottomLeft: Radius.circular(10),
+                                          bottomRight: Radius.circular(10)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 5,
+                                          blurRadius: 7,
+                                          offset: Offset(0,
+                                              3), // changes position of shadow
                                         ),
-                                      ))),
+                                      ],
+                                    ),
+                                    child: makeList.isEmpty
+                                        ? Container()
+                                        : Container(
+                                            child: Column(
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: Container(
+                                                  child: Text("Make"),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 9,
+                                                child: GridView.builder(
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  itemCount: makeList.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 5,
+                                                                left: 5.0,
+                                                                right: 5),
+                                                        child: InkWell(
+                                                          onTap: () {
+                                                            if (selectedMake ==
+                                                                makeList[index]
+                                                                    ['id']) {
+                                                              setState(() {
+                                                                make = false;
+                                                                selectedMake =
+                                                                    "";
+                                                              });
+                                                            } else {
+                                                              setState(() {
+                                                                make = true;
+                                                                selectedMake =
+                                                                    makeList[
+                                                                            index]
+                                                                        ['id'];
+                                                              });
+                                                            }
+
+                                                            updateList();
+                                                          },
+                                                          child: Card(
+                                                            elevation: 5,
+                                                            shadowColor:
+                                                                selectedMake ==
+                                                                        makeList[index]
+                                                                            [
+                                                                            'id']
+                                                                    ? Colors.red
+                                                                    : Colors
+                                                                        .black,
+                                                            color: Colors.white,
+                                                            child: Container(
+                                                              height:
+                                                                  height * 0.1,
+                                                              child: Column(
+                                                                children: [
+                                                                  Expanded(
+                                                                    flex: 3,
+                                                                    child:
+                                                                        Container(
+                                                                      child: Image
+                                                                          .network(
+                                                                        makeList[index]
+                                                                            [
+                                                                            'img'],
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 2,
+                                                                    child: Text(
+                                                                      makeList[
+                                                                              index]
+                                                                          [
+                                                                          'name'],
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              12),
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    flex: 1,
+                                                                    child: Text(
+                                                                      "",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              12),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ));
+                                                  },
+                                                  gridDelegate:
+                                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                                    crossAxisCount:
+                                                        width > width * 0.3
+                                                            ? 3
+                                                            : 1,
+                                                    childAspectRatio: 2,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ))),
+                              ],
+                            ),
+                          ),
                           Padding(
                             //   padding: EdgeInsets.all(width * 0),
                             padding: EdgeInsets.all(width * 0.0146),
@@ -253,7 +467,9 @@ class _ProductsState extends State<Products> {
                                 child: Container(
                                   child:
                                       productList.isEmpty &&
-                                              tempProductList.isNotEmpty
+                                              tempProductList.isNotEmpty &&
+                                              !category &&
+                                              !make
                                           ? Container(
                                               height: height * 0.5,
                                               child: GridView.builder(
@@ -476,8 +692,11 @@ class _ProductsState extends State<Products> {
                                                     itemBuilder:
                                                         (context, index) {
                                                       if (productList[index]
-                                                              ["makeId"] ==
-                                                          selectedCategory) {
+                                                                  ["makeId"] ==
+                                                              selectedMake ||
+                                                          productList[index][
+                                                                  "categoryID"] ==
+                                                              selectedCategory) {
                                                         return Padding(
                                                             padding:
                                                                 EdgeInsets.only(
