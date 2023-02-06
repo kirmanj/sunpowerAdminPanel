@@ -825,10 +825,10 @@ class _EditProductState extends State<EditProduct> {
 
                                                   'oemCode': int.parse(
                                                       oemCode.text.toString()),
-                                                  'itemCode': int.parse(
-                                                      itemCode.text.toString()),
-                                                  'barCode': int.parse(
-                                                      barCode.text.toString()),
+                                                  'itemCode':
+                                                      itemCode.text.toString(),
+                                                  'barCode':
+                                                      barCode.text.toString(),
                                                   'piecesInBox': int.parse(
                                                       piecesInBox.text
                                                           .toString()),
@@ -840,13 +840,13 @@ class _EditProductState extends State<EditProduct> {
                                                   'quantity': int.parse(
                                                       quantity.text.toString()),
                                                   'cost price':
-                                                      int.parse(cPrice.text),
+                                                      double.parse(cPrice.text),
                                                   'retail price':
-                                                      int.parse(rPrice.text),
+                                                      double.parse(rPrice.text),
                                                   'old price':
-                                                      int.parse(oPrice.text),
+                                                      double.parse(oPrice.text),
                                                   'wholesale price':
-                                                      int.parse(wPrice.text),
+                                                      double.parse(wPrice.text),
                                                   "Time": DateTime.now(),
                                                   "img": image,
 
@@ -1020,9 +1020,6 @@ class _EditProductState extends State<EditProduct> {
                                                     validator: (val) {
                                                       if (val!.isEmpty) {
                                                         return "Enter Barcode";
-                                                      } else if (val.length !=
-                                                          12) {
-                                                        return "Barcode should be 12 numbers";
                                                       } else {
                                                         return null;
                                                       }
@@ -1052,12 +1049,12 @@ class _EditProductState extends State<EditProduct> {
                                                     height: height * 0.075,
                                                     child: BarcodeWidget(
                                                       data: barCode.text,
-                                                      barcode: Barcode.ean13(),
+                                                      barcode: Barcode.code39(),
                                                       errorBuilder: (context,
                                                               error) =>
                                                           Center(
                                                               child: Text(
-                                                                  "ean 13 barcode should be 12 number")),
+                                                                  "Only uppercase Letter and Numbers")),
                                                     ),
                                                   ),
                                                 ),

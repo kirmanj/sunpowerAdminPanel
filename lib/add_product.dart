@@ -145,6 +145,8 @@ class _AddProductState extends State<AddProduct> {
           .then((value) {
         setState(() {
           selectedModel = value.docs[0]["mname"];
+          modelID = value.docs[0].id;
+          print(modelID);
           value.docs.forEach((element) {
             modelList.add(element);
           });
@@ -152,8 +154,6 @@ class _AddProductState extends State<AddProduct> {
       });
       value.docs.forEach((element) {
         setState(() {
-          modelID = value.docs[0].id;
-          print(modelID);
           makeList.add(element);
         });
       });
@@ -770,10 +770,10 @@ class _AddProductState extends State<AddProduct> {
                                                       ? 0
                                                       : int.parse(oemCode.text
                                                           .toString()),
-                                                  'itemCode': int.parse(
-                                                      itemCode.text.toString()),
-                                                  'barCode': int.parse(
-                                                      barCode.text.toString()),
+                                                  'itemCode':
+                                                      itemCode.text.toString(),
+                                                  'barCode':
+                                                      barCode.text.toString(),
                                                   'piecesInBox': int.parse(
                                                       piecesInBox.text
                                                           .toString()),
@@ -783,13 +783,13 @@ class _AddProductState extends State<AddProduct> {
                                                   'quantity': int.parse(
                                                       quantity.text.toString()),
                                                   'cost price':
-                                                      int.parse(cPrice.text),
+                                                      double.parse(cPrice.text),
                                                   'retail price':
-                                                      int.parse(rPrice.text),
+                                                      double.parse(rPrice.text),
                                                   'old price':
-                                                      int.parse(oPrice.text),
+                                                      double.parse(oPrice.text),
                                                   'wholesale price':
-                                                      int.parse(wPrice.text),
+                                                      double.parse(wPrice.text),
                                                   "Time": DateTime.now(),
                                                   "img": image,
 
@@ -961,15 +961,12 @@ class _AddProductState extends State<AddProduct> {
                                               validator: (val) {
                                                 if (val!.isEmpty) {
                                                   return "Enter Barcode";
-                                                } else if (val.length != 12) {
-                                                  return "Barcode should be 12 numbers";
                                                 } else {
                                                   return null;
                                                 }
                                               },
                                               decoration: InputDecoration(
-                                                hintText:
-                                                    "Enter 12 numbers EAN 13",
+                                                hintText: "Enter Barcode",
                                                 labelText: "Bar Code",
                                                 border: OutlineInputBorder(
                                                   borderRadius:
@@ -991,11 +988,11 @@ class _AddProductState extends State<AddProduct> {
                                               height: height * 0.075,
                                               child: BarcodeWidget(
                                                 data: barCode.text,
-                                                barcode: Barcode.ean13(),
+                                                barcode: Barcode.code39(),
                                                 errorBuilder:
                                                     (context, error) => Center(
                                                         child: Text(
-                                                            "ean 13 barcode should be 12 number")),
+                                                            "Only uppercase Letter and Numbers")),
                                               ),
                                             ),
                                           ),
