@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/web/widgets/empty.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
+import 'package:intl/intl.dart';
 
 class OrderHistory extends StatefulWidget {
   const OrderHistory({Key? key}) : super(key: key);
@@ -22,12 +23,19 @@ class _OrderHistoryState extends State<OrderHistory> {
         .doc("admindoc")
         .collection("orders")
         //.where("OrderStatus", isEqualTo: "Rejected")
-        .orderBy('date', descending: true)
+
         .get()
         .then((value) {
+      cancelOrder = value.docs;
       setState(() {
-        cancelOrder = value.docs;
+        cancelOrder.sort((a, b) {
+          var inputFormat = DateFormat('MM-dd-yyyy, hh:mm a');
+          var adate = inputFormat.parse(a['date']); // <-- dd/MM 24H format
+          var bdate = inputFormat.parse(b['date']);
+          return -adate.compareTo(bdate);
+        });
       });
+
       // ignore: deprecated_member_use
       //  productListSnapShot = new List<DocumentSnapshot>(value.docs.length);
 
@@ -50,24 +58,18 @@ class _OrderHistoryState extends State<OrderHistory> {
         .doc("admindoc")
         .collection("orders")
         // .where("OrderStatus", isEqualTo: "Accepted")
-        .orderBy('date', descending: true)
         .get()
         .then((value) {
+      acceptOrder = value.docs;
       setState(() {
-        acceptOrder = value.docs;
-      });
-      // ignore: deprecated_member_use
-      //  productListSnapShot = new List<DocumentSnapshot>(value.docs.length);
+        acceptOrder.sort((a, b) {
+          var inputFormat = DateFormat('MM-dd-yyyy, hh:mm a');
+          var adate = inputFormat.parse(a['date']); // <-- dd/MM 24H format
+          var bdate = inputFormat.parse(b['date']);
 
-      //   value.docs.forEach((element) async {
-      //     setState(() {
-      //       productListSnapShot[i] = element;
-      //       listLength=productListSnapShot.length;
-      //
-      //     });
-      //     i++;
-      //
-      //   });
+          return -adate.compareTo(bdate);
+        });
+      });
     });
   }
 

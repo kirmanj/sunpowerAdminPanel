@@ -767,9 +767,8 @@ class _AddProductState extends State<AddProduct> {
 
                                                   'oemCode': oemCode
                                                           .text.isEmpty
-                                                      ? 0
-                                                      : int.parse(oemCode.text
-                                                          .toString()),
+                                                      ? ""
+                                                      : oemCode.text.toString(),
                                                   'itemCode':
                                                       itemCode.text.toString(),
                                                   'barCode':

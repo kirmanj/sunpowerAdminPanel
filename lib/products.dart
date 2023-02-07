@@ -192,7 +192,7 @@ class _ProductsState extends State<Products> {
                                               Expanded(
                                                 flex: 1,
                                                 child: Container(
-                                                  child: Text("Category"),
+                                                  child: Text("Category "),
                                                 ),
                                               ),
                                               Expanded(
@@ -244,6 +244,14 @@ class _ProductsState extends State<Products> {
                                                                 : Colors.black,
                                                             color: Colors.white,
                                                             child: Container(
+                                                              color: selectedCategory ==
+                                                                      categoryList[
+                                                                              index]
+                                                                          ['id']
+                                                                  ? Colors
+                                                                      .red[900]
+                                                                  : Colors
+                                                                      .white,
                                                               height:
                                                                   height * 0.1,
                                                               child: Column(
@@ -270,8 +278,10 @@ class _ProductsState extends State<Products> {
                                                                           [
                                                                           'name'],
                                                                       style: TextStyle(
-                                                                          fontSize:
-                                                                              12),
+                                                                          color: selectedCategory == categoryList[index]['id']
+                                                                              ? Colors.white
+                                                                              : Colors.black,
+                                                                          fontSize: 12),
                                                                     ),
                                                                   ),
                                                                   Expanded(
@@ -380,6 +390,14 @@ class _ProductsState extends State<Products> {
                                                                         .black,
                                                             color: Colors.white,
                                                             child: Container(
+                                                              color: selectedMake ==
+                                                                      makeList[
+                                                                              index]
+                                                                          ['id']
+                                                                  ? Colors
+                                                                      .red[900]
+                                                                  : Colors
+                                                                      .white,
                                                               height:
                                                                   height * 0.1,
                                                               child: Column(
@@ -406,8 +424,10 @@ class _ProductsState extends State<Products> {
                                                                           [
                                                                           'name'],
                                                                       style: TextStyle(
-                                                                          fontSize:
-                                                                              12),
+                                                                          color: selectedMake == makeList[index]['id']
+                                                                              ? Colors.white
+                                                                              : Colors.black,
+                                                                          fontSize: 12),
                                                                     ),
                                                                   ),
                                                                   Expanded(

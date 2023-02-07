@@ -823,8 +823,8 @@ class _EditProductState extends State<EditProduct> {
                                                   'descK': descK.text,
                                                   'descA': descA.text,
 
-                                                  'oemCode': int.parse(
-                                                      oemCode.text.toString()),
+                                                  'oemCode':
+                                                      oemCode.text.toString(),
                                                   'itemCode':
                                                       itemCode.text.toString(),
                                                   'barCode':
