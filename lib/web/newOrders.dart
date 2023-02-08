@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/web/widgets/empty.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 import '../newOrderDetail.dart';
@@ -124,9 +125,9 @@ class _NewOrdersState extends State<NewOrders> {
                             itemCount:
                                 snapshotOrder.data()['productList'].length,
                             itemBuilder: (context, i) {
-                              productIDs.add(snapshotOrder
-                                  .data()['productList'][i]["productID"]
-                                  .toString());
+                              // productIDs.add(snapshotOrder
+                              //     .data()['productList'][i]["productID"]
+                              //     .toString());
                               return SingleChildScrollView(
                                 child: Container(
                                   child: Row(
@@ -141,6 +142,17 @@ class _NewOrdersState extends State<NewOrders> {
                                         snapshotOrder
                                             .data()['productList'][i]['name']
                                             .toString(),
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Text(
+                                        snapshotOrder.data()['productList'][i]
+                                            ['itemCode'],
                                         style: TextStyle(fontSize: 14),
                                       ),
                                       SizedBox(
@@ -491,8 +503,6 @@ class _NewOrdersState extends State<NewOrders> {
                             itemCount: snapshot.data.docs.length,
                             //scrollDirection: Axis.horizontal,
                             itemBuilder: ((context, index) {
-                              //productIDs.add(snapshot.data.docs[index]["productID"]);
-
                               userID = snapshot.data.docs[index]["userID"];
                               orderID = snapshot.data.docs[index]["orderID"];
                               return snapshot.data.docs[index]
@@ -651,7 +661,10 @@ class _NewOrdersState extends State<NewOrders> {
                             }));
                       } else {
                         //<DoretcumentSnapshot> items = snapshot.data;
-                        return Container(child: EmptyWidget());
+                        return Container(
+                            child: Center(
+                          child: Text("No Orders"),
+                        ));
                       }
                     }),
               ),

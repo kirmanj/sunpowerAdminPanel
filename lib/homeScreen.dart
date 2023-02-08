@@ -78,9 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? width * 0.5
                   : width * 0.15,
               child: Image.asset(
-                true
-                    ? 'assets/images/sunpower2.png'
-                    : 'assets/images/sunpower.png',
+                'assets/images/sunpower2.png',
                 fit: BoxFit.fitHeight,
               ),
             ),
