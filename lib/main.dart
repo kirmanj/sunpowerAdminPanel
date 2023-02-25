@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/adminControl.dart';
+import 'package:explore/authdialog.dart';
 import 'package:explore/homeScreen.dart';
 import 'package:explore/products.dart';
 import 'package:explore/scrollbehaivori.dart';
@@ -25,7 +26,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Future getUserInfo() async {
     await getUser();
-    // setState(() {});
+    if (this.mounted) {
+      setState(() {
+        uid = '';
+      });
+    }
+
+    print(uid);
   }
 
   @override

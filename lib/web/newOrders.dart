@@ -290,7 +290,8 @@ class _NewOrdersState extends State<NewOrders> {
                                                             -quantity)
                                                   });
                                                 });
-
+                                                userID =
+                                                    value.data()?["userID"];
                                                 print(element);
                                                 print(quantity);
                                               });
@@ -309,12 +310,13 @@ class _NewOrdersState extends State<NewOrders> {
                                                 "OrderStatus": "Accepted",
                                                 "date": orderDate,
                                               });
-
+                                              print(userID);
+                                              print(orderID);
                                               FirebaseFirestore.instance
                                                   .collection("users")
                                                   .doc(userID)
                                                   .collection("orders")
-                                                  .doc(orderID)
+                                                  .doc(snapshotOrder.id)
                                                   .update({
                                                 "OrderStatus": "Accepted",
                                                 "date": orderDate,
@@ -407,26 +409,40 @@ class _NewOrdersState extends State<NewOrders> {
                                                   .doc("admindoc")
                                                   .collection("orders")
                                                   .doc(snapshotOrder.id)
-                                                  .update({
-                                                "OrderStatus": "Rejected",
-                                                "date": orderDate,
+                                                  .get()
+                                                  .then((value) {
+                                                userID =
+                                                    value.data()?["userID"];
+                                              }).whenComplete(() {
+                                                print(userID);
+                                                print(snapshotOrder.id);
+                                                FirebaseFirestore.instance
+                                                    .collection("Admin")
+                                                    .doc("admindoc")
+                                                    .collection("orders")
+                                                    .doc(snapshotOrder.id)
+                                                    .update({
+                                                  "OrderStatus": "Rejected",
+                                                  "date": orderDate,
+                                                });
+
+                                                FirebaseFirestore.instance
+                                                    .collection("users")
+                                                    .doc(userID)
+                                                    .collection("orders")
+                                                    .doc(snapshotOrder.id)
+                                                    .update({
+                                                  "OrderStatus": "Rejected",
+                                                  "date": orderDate,
+                                                });
                                               });
 
-                                              FirebaseFirestore.instance
-                                                  .collection("users")
-                                                  .doc(userID)
-                                                  .collection("orders")
-                                                  .doc(orderID)
-                                                  .update({
-                                                "OrderStatus": "Rejected",
-                                                "date": orderDate,
-                                              });
                                               setState(() {
                                                 queryLoad = false;
                                               });
-
-                                              Navigator.of(context).pop();
                                             });
+
+                                            Navigator.of(context).pop();
                                           },
                                           child: Text('Yes',
                                               style: TextStyle(
@@ -509,7 +525,10 @@ class _NewOrdersState extends State<NewOrders> {
                                           .data()['OrderStatus']
                                           .toString() !=
                                       "Pending"
-                                  ? Container()
+                                  ? Container(
+                                      child: Center(
+                                      child: Text("No Orders"),
+                                    ))
                                   : Padding(
                                       padding: const EdgeInsets.all(12.0),
                                       child: Stack(

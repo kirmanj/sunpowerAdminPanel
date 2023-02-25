@@ -3,6 +3,7 @@ import 'package:explore/homeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -583,8 +584,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                                                           ),
                                                                           InkWell(
                                                                             onTap:
-                                                                                () {
+                                                                                () async {
+                                                                              User? user;
                                                                               FirebaseFirestore.instance.collection("users").doc(snapshot.data.docs[index].id.toString()).delete();
+
+                                                                              UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                                                                                email: snapshot.data.docs[index].data()['email'].toString(),
+                                                                                password: snapshot.data.docs[index].data()['password'].toString(),
+                                                                              );
+                                                                              user = userCredential.user;
+
+                                                                              if (user != null) {
+                                                                                FirebaseAuth.instance.currentUser!.delete();
+                                                                              }
+
                                                                               ScaffoldMessenger.of(context).showSnackBar(_delete);
                                                                               Navigator.pop(context);
                                                                               Navigator.pop(context);

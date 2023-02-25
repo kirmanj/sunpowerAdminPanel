@@ -144,7 +144,7 @@ Future<User?> signInWithEmailPassword(
     );
     user = userCredential.user;
 
-    if (user != null) {
+    if (user != null && user.uid == "99Dtd1qW7eSjFqA6864PKfBzFap2") {
       uid = user.uid;
       userEmail = user.email;
 
