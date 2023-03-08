@@ -3,6 +3,7 @@ import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/adminControl.dart';
 import 'package:explore/authdialog.dart';
 import 'package:explore/homeScreen.dart';
+import 'package:explore/login.dart';
 import 'package:explore/products.dart';
 import 'package:explore/scrollbehaivori.dart';
 import 'package:explore/utils/authentication.dart';
@@ -26,11 +27,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Future getUserInfo() async {
     await getUser();
-    if (this.mounted) {
-      setState(() {
-        uid = '';
-      });
-    }
+    if (this.mounted) {}
 
     print(uid);
   }
@@ -48,7 +45,7 @@ class _MyAppState extends State<MyApp> {
       theme: lightThemeData,
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: LoginScreen(),
     );
   }
 }

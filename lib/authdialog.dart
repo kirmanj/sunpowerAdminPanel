@@ -88,6 +88,8 @@ class _AuthDialogState extends State<AuthDialog> {
     return null;
   }
 
+  bool adminEmail = false;
+
   @override
   void initState() {
     textControllerEmail = TextEditingController();
@@ -107,45 +109,7 @@ class _AuthDialogState extends State<AuthDialog> {
 
   bool isNew = false;
 
-  String phoneNumber = "";
-  sendOTP(String phoneNumber) async {
-    this.phoneNumber = phoneNumber;
-    FirebaseAuth auth = FirebaseAuth.instance;
-    ConfirmationResult confirmationResult = await auth.signInWithPhoneNumber(
-      '+964 $phoneNumber',
-    );
-    print("OTP Sent to +964 $phoneNumber");
-    return confirmationResult;
-  }
-
   late UserCredential userCredential;
-
-  authenticateMe(ConfirmationResult confirmationResult, String otp) async {
-    userCredential = await confirmationResult.confirm(otp);
-    userCredential.additionalUserInfo!.isNewUser
-        ? print("Successful Authentication")
-        : print("User already exists");
-
-    if (userCredential.additionalUserInfo!.isNewUser) {
-      setState(() {
-        isNew = true;
-      });
-    } else {
-      setState(() {
-        loginStatus = 'You have successfully logged in';
-        loginStringColor = Colors.green;
-        uid = userCredential.user?.uid;
-      });
-      Future.delayed(Duration(milliseconds: 500), () {
-        Navigator.of(context).pop();
-
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          fullscreenDialog: true,
-          builder: (context) => HomeScreen(),
-        ));
-      });
-    }
-  }
 
   var temp;
 
@@ -185,32 +149,6 @@ class _AuthDialogState extends State<AuthDialog> {
                             color: Theme.of(context).textTheme.subtitle2!.color,
                             fontSize: 18),
                       ),
-                      // Flexible(
-                      //   child: RichText(
-                      //     textAlign: TextAlign.left,
-                      //     overflow: TextOverflow.visible,
-                      //     strutStyle: StrutStyle(
-                      //       fontSize: ResponsiveWidget.isSmallScreen(context)
-                      //           ? 12
-                      //           : 18,
-                      //     ),
-                      //     text: TextSpan(
-                      //       style: TextStyle(
-                      //         fontWeight: FontWeight.bold,
-                      //         color: isPhone
-                      //             ? Colors.grey[400]
-                      //             : Theme.of(context)
-                      //                 .textTheme
-                      //                 .subtitle2!
-                      //                 .color,
-                      //         fontSize: ResponsiveWidget.isSmallScreen(context)
-                      //             ? 12
-                      //             : 18,
-                      //       ),
-                      //       text: 'Email address',
-                      //     ),
-                      //   ),
-                      // ),
                     ),
                   ],
                 ),
@@ -230,6 +168,24 @@ class _AuthDialogState extends State<AuthDialog> {
                     setState(() {
                       _isEditingEmail = true;
                     });
+                    if (textControllerEmail.text.contains(".com")) {
+                      FirebaseFirestore.instance
+                          .collection("Admin")
+                          .doc("adminUser")
+                          .get()
+                          .then((value) {
+                        String email = value.get("email");
+                        if (email == textControllerEmail.text.toString()) {
+                          setState(() {
+                            adminEmail = true;
+                          });
+                        }
+                      });
+                    } else {
+                      setState(() {
+                        adminEmail = false;
+                      });
+                    }
                   },
                   onSubmitted: (value) {
                     textFocusNodeEmail.unfocus();
@@ -261,65 +217,70 @@ class _AuthDialogState extends State<AuthDialog> {
                 ),
               ),
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 20.0,
-                  bottom: 8,
-                ),
-                child: Text(
-                  "Password",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.subtitle2!.color,
-                      fontSize: 18),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 20.0,
-                  right: 20,
-                ),
-                child: TextField(
-                  focusNode: textFocusNodePassword,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.done,
-                  controller: textControllerPassword,
-                  obscureText: true,
-                  autofocus: false,
-                  onChanged: (value) {
-                    setState(() {
-                      _isEditingPassword = true;
-                    });
-                  },
-                  onSubmitted: (value) {
-                    textFocusNodePassword.unfocus();
-                    FocusScope.of(context).requestFocus(textFocusNodePassword);
-                  },
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    border: new OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Colors.blueGrey[800]!,
-                        width: 3,
+              !adminEmail
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20.0,
+                        bottom: 8,
+                      ),
+                      child: Text(
+                        "Password",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.subtitle2!.color,
+                            fontSize: 18),
                       ),
                     ),
-                    filled: true,
-                    hintStyle: new TextStyle(
-                      color: Colors.blueGrey[300],
+              !adminEmail
+                  ? Container()
+                  : Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20.0,
+                        right: 20,
+                      ),
+                      child: TextField(
+                        focusNode: textFocusNodePassword,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.done,
+                        controller: textControllerPassword,
+                        obscureText: true,
+                        autofocus: false,
+                        onChanged: (value) {
+                          setState(() {
+                            _isEditingPassword = true;
+                          });
+                        },
+                        onSubmitted: (value) {
+                          textFocusNodePassword.unfocus();
+                          FocusScope.of(context)
+                              .requestFocus(textFocusNodePassword);
+                        },
+                        style: TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                          border: new OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.blueGrey[800]!,
+                              width: 3,
+                            ),
+                          ),
+                          filled: true,
+                          hintStyle: new TextStyle(
+                            color: Colors.blueGrey[300],
+                          ),
+                          hintText: "Password",
+                          fillColor: Colors.white,
+                          errorText: _isEditingPassword
+                              ? _validatePassword(textControllerPassword.text)
+                              : null,
+                          errorStyle: TextStyle(
+                            fontSize: 12,
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      ),
                     ),
-                    hintText: "Password",
-                    fillColor: Colors.white,
-                    errorText: _isEditingPassword
-                        ? _validatePassword(textControllerPassword.text)
-                        : null,
-                    errorStyle: TextStyle(
-                      fontSize: 12,
-                      color: Colors.redAccent,
-                    ),
-                  ),
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Row(
@@ -347,26 +308,20 @@ class _AuthDialogState extends State<AuthDialog> {
                                           textControllerPassword.text,
                                           context)
                                       .then((result) {
-                                    if (uid != '99Dtd1qW7eSjFqA6864PKfBzFap2') {
-                                      loginStatus = 'Not Admin Email';
-                                    } else if (result != null &&
-                                        uid == '99Dtd1qW7eSjFqA6864PKfBzFap2') {
-                                      print(result);
-                                      setState(() {
-                                        loginStatus =
-                                            'You have successfully logged in';
-                                        loginStringColor = Colors.green;
-                                      });
-                                      Future.delayed(
-                                          Duration(milliseconds: 500), () {
-                                        Navigator.of(context).pop();
-                                        Navigator.of(context)
-                                            .pushReplacement(MaterialPageRoute(
-                                          fullscreenDialog: true,
-                                          builder: (context) => HomeScreen(),
-                                        ));
-                                      });
-                                    }
+                                    setState(() {
+                                      loginStatus =
+                                          'You have successfully logged in';
+                                      loginStringColor = Colors.green;
+                                    });
+                                    Future.delayed(Duration(milliseconds: 500),
+                                        () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context)
+                                          .pushReplacement(MaterialPageRoute(
+                                        fullscreenDialog: true,
+                                        builder: (context) => HomeScreen(),
+                                      ));
+                                    });
                                   }).catchError((error) {
                                     print('Login Error: $error');
                                     setState(() {
@@ -472,15 +427,45 @@ class _AuthDialogState extends State<AuthDialog> {
               SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Sunpower',
-                  maxLines: 2,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.subtitle2!.color,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w300,
-                    // letterSpacing: 3,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        'Sunpower',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.subtitle2!.color,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          // letterSpacing: 3,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Row(
+                        children: [
+                          Text(
+                            'Admin Check ',
+                            //maxLines: 2,
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.subtitle2!.color,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              // letterSpacing: 3,
+                            ),
+                          ),
+                          Icon(
+                            !adminEmail ? Icons.cancel : Icons.check_circle,
+                            color: adminEmail ? Colors.green : Colors.red,
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
               ),
             ],
