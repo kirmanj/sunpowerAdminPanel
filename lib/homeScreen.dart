@@ -17,6 +17,7 @@ import 'package:explore/web/responsive.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'add_model.dart';
 import 'add_product.dart';
 
@@ -99,8 +100,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                     IconButton(
-                        onPressed: () {
+                        onPressed: () async {
                           signOut();
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+
+                          prefs.setBool('auth', false);
+                          prefs.setString('uid', "");
                           Navigator.of(context)
                               .pushReplacement(MaterialPageRoute(
                             fullscreenDialog: true,
@@ -349,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => LoginScreen()));
+                                        builder: (context) => AddUser()));
                               },
                               child: Container(
                                   width: width * 0.08,

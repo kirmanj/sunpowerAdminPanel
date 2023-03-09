@@ -16,13 +16,27 @@ class _LoginScreenState extends State<LoginScreen> {
   late String _email, _password, _name, _phone, _address;
   final auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
-
+  bool authSignedIn = false;
   bool wholeSale = true;
+  thisUserGet() async {
+    print(authSignedIn);
+    await getUser().then((value) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      print(uid);
+      if (uid!.isNotEmpty) {
+        setState(() {
+          authSignedIn = prefs.getBool('auth') ?? false;
+        });
+        print(authSignedIn);
+      }
+    });
+    // print(uid.toString() + "thisuer");
+  }
 
   @override
   void initState() {
-    getUser();
-    print(uid);
+    thisUserGet();
+
     // TODO: implement initState
     super.initState();
   }
@@ -35,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Container(
         height: height,
-        child: uid != null ? HomeScreen() : AuthDialog(),
+        child: authSignedIn ? HomeScreen() : AuthDialog(),
       ),
     );
   }

@@ -27,9 +27,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Future getUserInfo() async {
     await getUser();
-    if (this.mounted) {}
-
-    print(uid);
   }
 
   @override

@@ -25,14 +25,20 @@ Future getUser() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool authSignedIn = prefs.getBool('auth') ?? false;
 
-  final User? user = _auth.currentUser;
-
+  User? user = _auth.currentUser;
+  print("inmethod");
+  print(authSignedIn);
   if (authSignedIn == true) {
     if (user != null) {
+      print("inmethod");
+
+      print(user.uid);
       uid = user.uid;
       name = user.displayName;
       userEmail = user.email;
       imageUrl = user.photoURL;
+    } else {
+      uid = prefs.getString('uid');
     }
   }
 }
@@ -98,6 +104,7 @@ Future<User?> signInWithGoogle() async {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('auth', true);
+    await prefs.setString('uid', user.uid.toString());
   }
 
   return user;
@@ -151,6 +158,7 @@ Future<User?> signInWithEmailPassword(
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       await prefs.setBool('auth', true);
+      await prefs.setString('uid', user.uid.toString());
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           fullscreenDialog: true,
